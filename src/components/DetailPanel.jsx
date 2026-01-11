@@ -5,17 +5,19 @@ import { DATA, NAKSHATRAS_EN, NAKSHATRAS_HI } from '../data/constants';
 import { calculatePanchang, getHindiMonthIndex, getDayTheme, getChoghadiya } from '../utils/helpers';
 import Confetti from './Confetti';
 
-// Visual Moon Widget Component
-const MoonPhaseVisual = ({ tithiRaw }) => {
+// Visual Moon Widget Component (Updated with Translation)
+const MoonPhaseVisual = ({ tithiRaw, lang }) => {
   // 0-14: Shukla (Waxing), 15-29: Krishna (Waning)
-  // We approximate the phase for visual representation
   const isWaxing = tithiRaw < 15;
   const phase = isWaxing ? tithiRaw / 15 : (30 - tithiRaw) / 15;
   
-  // Calculate mask position
-  // This is a simplified visual representation
   const maskX = isWaxing ? -50 + (phase * 100) : 50 - (phase * 100);
   
+  // Translation logic for the widget
+  const label = lang === 'hi' 
+    ? (isWaxing ? 'शुक्ल पक्ष' : 'कृष्ण पक्ष') 
+    : (isWaxing ? 'Waxing' : 'Waning');
+
   return (
     <div className="flex flex-col items-center justify-center p-4 bg-gray-900 rounded-xl text-white">
       <div className="relative w-16 h-16 rounded-full bg-gray-700 overflow-hidden shadow-inner border border-gray-600">
@@ -26,11 +28,10 @@ const MoonPhaseVisual = ({ tithiRaw }) => {
             transform: `scale(${0.2 + (phase * 0.8)})` 
           }}
         />
-        {/* Shine effect */}
         <div className="absolute top-0 right-0 w-8 h-8 bg-white opacity-20 blur-md rounded-full" />
       </div>
       <span className="text-xs font-medium mt-2 text-gray-300 uppercase tracking-widest">
-        {isWaxing ? 'Waxing' : 'Waning'} • {Math.round(phase * 100)}%
+        {label} • {Math.round(phase * 100)}%
       </span>
     </div>
   );
@@ -71,7 +72,7 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
         },
         () => {
           // Denied/Error -> Use Default
-          setLocation(null); // Indicates using approximation
+          setLocation(null); 
           setSunTimes(SunCalc.getTimes(date, defaultLoc.lat, defaultLoc.lng));
           setLocLoading(false);
         }
@@ -91,13 +92,12 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
     return `${h}:${m.toString().padStart(2, '0')} ${ampm}`;
   };
 
-  // Google Calendar Link Generator
   const addToGoogleCalendar = () => {
     const title = theme ? theme.name : `Panchang: ${tithiName}`;
     const desc = `${tithiName}, ${pakshaName} Paksha. Nakshatra: ${nakshatraName}.`;
     
     const start = new Date(date);
-    start.setHours(9, 0, 0); // Default 9 AM
+    start.setHours(9, 0, 0); 
     const end = new Date(date);
     end.setHours(10, 0, 0);
 
@@ -198,7 +198,6 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
       <div className="flex-1 overflow-y-auto bg-gray-50/50 p-6">
         {activeTab === 'overview' && (
           <div className="space-y-6 animate-fade-in">
-             {/* Quick Stats */}
              <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
                    <Sun size={24} className="text-orange-500 mb-2" />
@@ -212,12 +211,14 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
                 </div>
              </div>
 
-             {/* Location Badge */}
+             {/* Location Badge (Now Translated) */}
              <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
                <MapPin size={12} />
                {locLoading ? 
-                 <span>Locating...</span> : 
-                 location ? <span>Using GPS Time</span> : <span>Estimated Time (Indore)</span>
+                 <span>{lang === 'hi' ? 'स्थान खोज रहा है...' : 'Locating...'}</span> : 
+                 location ? 
+                   <span>{lang === 'hi' ? 'GPS समय सक्रिय' : 'Using GPS Time'}</span> : 
+                   <span>{lang === 'hi' ? 'अनुमानित समय (इंदौर)' : 'Estimated Time (Indore)'}</span>
                }
              </div>
 
@@ -229,7 +230,7 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
                 <button 
                   onClick={addToGoogleCalendar}
                   className="text-blue-600 hover:bg-blue-50 p-2 rounded-full transition-colors"
-                  title="Add to Google Calendar"
+                  title={lang === 'hi' ? "गूगल कैलेंडर में जोड़ें" : "Add to Google Calendar"}
                 >
                   <Share2 size={16} />
                 </button>
@@ -276,8 +277,8 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
               </h3>
             </div>
 
-            {/* VISUAL MOON WIDGET */}
-            <MoonPhaseVisual tithiRaw={panchang.tithiRaw} />
+            {/* Visual Moon Widget (Props updated to pass language) */}
+            <MoonPhaseVisual tithiRaw={panchang.tithiRaw} lang={lang} />
 
             <div className={`space-y-6 ${lang === 'hi' ? 'font-hindi' : 'font-eng'}`}>
               <div className="flex justify-between items-center border-b border-gray-50 pb-3">
