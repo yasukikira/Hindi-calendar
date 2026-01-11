@@ -1,5 +1,6 @@
 import { DATA } from '../data/constants';
 
+// ... (Keep calculatePanchang existing code) ...
 export const calculatePanchang = (date) => {
   const J2000 = 2451545.0;
   const toJulian = (d) => (d.getTime() / 86400000) - (d.getTimezoneOffset() / 1440) + 2440587.5;
@@ -40,6 +41,7 @@ export const calculatePanchang = (date) => {
   };
 };
 
+// ... (Keep getHindiMonthIndex existing code) ...
 export const getHindiMonthIndex = (date) => {
   const m = date.getMonth();
   const d = date.getDate();
@@ -48,24 +50,19 @@ export const getHindiMonthIndex = (date) => {
   return (m + offset) % 12; 
 };
 
+// ... (Keep getChoghadiya existing code) ...
 export const getChoghadiya = (date, lang) => {
-  const day = date.getDay(); // 0 Sun, 6 Sat
+  const day = date.getDay(); 
   const sequences = [
-    ['udveg', 'chal', 'labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg'], // Sun
-    ['amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit'], // Mon
-    ['rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal', 'shubh', 'rog'],   // Tue
-    ['labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh'],   // Wed
-    ['shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal', 'shubh'], // Thu
-    ['chal', 'labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal'],   // Fri
-    ['kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal']    // Sat
+    ['udveg', 'chal', 'labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg'], 
+    ['amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit'], 
+    ['rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal', 'shubh', 'rog'],   
+    ['labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh'],   
+    ['shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal', 'shubh'], 
+    ['chal', 'labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal'],   
+    ['kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal']    
   ];
-
-  const seq = sequences[day];
-  const slots = [
-    "06:00 - 07:30", "07:30 - 09:00", "09:00 - 10:30", "10:30 - 12:00",
-    "12:00 - 01:30", "01:30 - 03:00", "03:00 - 04:30", "04:30 - 06:00"
-  ];
-
+  const slots = ["06:00 - 07:30", "07:30 - 09:00", "09:00 - 10:30", "10:30 - 12:00", "12:00 - 01:30", "01:30 - 03:00", "03:00 - 04:30", "04:30 - 06:00"];
   return slots.map((time, i) => {
     const type = seq[i];
     const label = DATA[lang].choghadiya[type];
@@ -76,13 +73,13 @@ export const getChoghadiya = (date, lang) => {
   });
 };
 
+// ... (Keep getDayTheme existing code) ...
 export const getDayTheme = (date, panchang, monthIdx, lang) => {
   const d = date.getDate();
-  const m = date.getMonth(); // 0-indexed
+  const m = date.getMonth(); 
   const y = date.getFullYear();
   const { tithiRaw } = panchang;
 
-  // --- FIXED DATE FESTIVALS ---
   if (d === 1 && m === 0) return { type: 'newyear', name: lang === 'hi' ? 'नव वर्ष' : 'New Year', icon: '🎉' };
   if (d === 26 && m === 0) return { type: 'national', name: lang === 'hi' ? 'गणतंत्र दिवस' : 'Republic Day', icon: '🇮🇳' };
   if (d === 15 && m === 7) return { type: 'national', name: lang === 'hi' ? 'स्वतंत्रता दिवस' : 'Independence Day', icon: '🇮🇳' };
@@ -91,7 +88,6 @@ export const getDayTheme = (date, panchang, monthIdx, lang) => {
   if (d === 14 && m === 1) return { type: 'valentine', name: lang === 'hi' ? 'वैलेंटाइन्स डे' : 'Valentine\'s Day', icon: '💖' };
   if (d === 25 && m === 11) return { type: 'christmas', name: lang === 'hi' ? 'क्रिसमस' : 'Christmas', icon: '🎄' };
 
-  // --- 2025 OVERRIDES ---
   if (y === 2025) {
     if (d === 26 && m === 1) return { type: 'shivratri', name: lang === 'hi' ? 'महाशिवरात्रि' : 'Mahashivratri', icon: '🕉️' };
     if (d === 14 && m === 2) return { type: 'holi', name: lang === 'hi' ? 'होली' : 'Holi', icon: '🎨' };
@@ -106,8 +102,6 @@ export const getDayTheme = (date, panchang, monthIdx, lang) => {
     if (d === 2 && m === 9) return { type: 'festive', name: lang === 'hi' ? 'दशहरा' : 'Dussehra', icon: '🏹' };
     if (d === 20 && m === 9) return { type: 'diwali', name: lang === 'hi' ? 'दीपावली' : 'Diwali', icon: '🪔' };
   }
-
-  // --- 2026 OVERRIDES ---
   if (y === 2026) {
     if (d === 15 && m === 1) return { type: 'shivratri', name: lang === 'hi' ? 'महाशिवरात्रि' : 'Mahashivratri', icon: '🕉️' };
     if (d === 4 && m === 2) return { type: 'holi', name: lang === 'hi' ? 'होली' : 'Holi', icon: '🎨' };
@@ -120,10 +114,45 @@ export const getDayTheme = (date, panchang, monthIdx, lang) => {
     if (d === 8 && m === 10) return { type: 'diwali', name: lang === 'hi' ? 'दीपावली' : 'Diwali', icon: '🪔' };
   }
 
-  // Fallback
   if (tithiRaw === 14) return { type: 'purnima', name: lang === 'hi' ? 'पूर्णिमा' : 'Purnima', icon: '🌕' };
   if (tithiRaw === 29) return { type: 'amavasya', name: lang === 'hi' ? 'अमावस्या' : 'Amavasya', icon: '🌑' };
   if (tithiRaw === 10) return { type: 'ekadashi', name: lang === 'hi' ? 'एकादशी' : 'Ekadashi', icon: '🙏' };
 
   return null;
+};
+
+// --- NEW FUNCTION: Get Auspicious/Inauspicious Times ---
+export const getAuspiciousTimes = (date, sunTimes) => {
+  if (!sunTimes) return null;
+  
+  const start = sunTimes.sunrise.getTime();
+  const end = sunTimes.sunset.getTime();
+  const dayDuration = end - start;
+  const part = dayDuration / 8; // Dividing day into 8 parts
+  
+  const day = date.getDay(); // 0 = Sun, 1 = Mon...
+  
+  // Logic: Which "part" (1-8) corresponds to Rahu/Yama for each day
+  const rahuMap = [8, 2, 7, 5, 6, 4, 3]; // Sun=8th part, Mon=2nd part...
+  const yamaMap = [5, 4, 3, 2, 1, 7, 6]; // Sun=5th part...
+
+  const getSlot = (partIndex) => {
+    const s = new Date(start + (partIndex - 1) * part);
+    const e = new Date(start + partIndex * part);
+    return `${formatTimeSimple(s)} - ${formatTimeSimple(e)}`;
+  };
+
+  return {
+    rahu: getSlot(rahuMap[day]),
+    yama: getSlot(yamaMap[day])
+  };
+};
+
+const formatTimeSimple = (date) => {
+  let h = date.getHours();
+  const m = date.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12;
+  h = h ? h : 12;
+  return `${h}:${m.toString().padStart(2, '0')} ${ampm}`;
 };
