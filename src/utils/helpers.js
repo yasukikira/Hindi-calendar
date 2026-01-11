@@ -78,11 +78,12 @@ export const getChoghadiya = (date, lang) => {
 
 export const getDayTheme = (date, panchang, monthIdx, lang) => {
   const d = date.getDate();
-  const m = date.getMonth(); // 0-indexed (Jan is 0)
+  const m = date.getMonth(); // 0-indexed
   const y = date.getFullYear();
   const { tithiRaw } = panchang;
 
-  // --- FIXED DATE FESTIVALS (Solar) ---
+  // --- FIXED DATE FESTIVALS ---
+  if (d === 1 && m === 0) return { type: 'newyear', name: lang === 'hi' ? 'नव वर्ष' : 'New Year', icon: '🎉' };
   if (d === 26 && m === 0) return { type: 'national', name: lang === 'hi' ? 'गणतंत्र दिवस' : 'Republic Day', icon: '🇮🇳' };
   if (d === 15 && m === 7) return { type: 'national', name: lang === 'hi' ? 'स्वतंत्रता दिवस' : 'Independence Day', icon: '🇮🇳' };
   if (d === 2 && m === 9) return { type: 'national', name: lang === 'hi' ? 'गांधी जयंती' : 'Gandhi Jayanti', icon: '🕊️' };
@@ -90,37 +91,36 @@ export const getDayTheme = (date, panchang, monthIdx, lang) => {
   if (d === 14 && m === 1) return { type: 'valentine', name: lang === 'hi' ? 'वैलेंटाइन्स डे' : 'Valentine\'s Day', icon: '💖' };
   if (d === 25 && m === 11) return { type: 'christmas', name: lang === 'hi' ? 'क्रिसमस' : 'Christmas', icon: '🎄' };
 
-  // --- 2025 OVERRIDES (Verified) ---
+  // --- 2025 OVERRIDES ---
   if (y === 2025) {
-    if (d === 26 && m === 1) return { type: 'shivratri', name: lang === 'hi' ? 'महाशिवरात्रि' : 'Mahashivratri', icon: '🕉️' }; // Feb 26
-    if (d === 14 && m === 2) return { type: 'holi', name: lang === 'hi' ? 'होली' : 'Holi', icon: '🎨' }; // Mar 14
-    if (d === 31 && m === 2) return { type: 'eid', name: lang === 'hi' ? 'ईद-उल-फितर' : 'Eid-ul-Fitr', icon: '☪️' }; // Mar 31
-    if (d === 6 && m === 5) return { type: 'bakrid', name: lang === 'hi' ? 'बकरीद' : 'Eid al-Adha', icon: '🐐' }; // June 6/7
-    if (d === 6 && m === 6) return { type: 'muharram', name: lang === 'hi' ? 'मुहर्रम' : 'Muharram', icon: '🕌' }; // July 6
-    if (d === 9 && m === 7) return { type: 'rakhi', name: lang === 'hi' ? 'रक्षा बंधन' : 'Raksha Bandhan', icon: '🎁' }; // Aug 9
-    if (d === 16 && m === 7) return { type: 'janmashtami', name: lang === 'hi' ? 'जन्माष्टमी' : 'Janmashtami', icon: '🪈' }; // Aug 16
-    if (d === 26 && m === 7) return { type: 'ganesh', name: lang === 'hi' ? 'गणेश चतुर्थी' : 'Ganesh Chaturthi', icon: '🐘' }; // Aug 26
-    if (d === 5 && m === 8) return { type: 'onam', name: lang === 'hi' ? 'ओणम' : 'Onam', icon: '🌸' }; // Sept 5
-    if (d === 5 && m === 8) return { type: 'milad', name: lang === 'hi' ? 'मिलाद-उन-नबी' : 'Milad-un-Nabi', icon: '📿' }; // Sept 5
-    if (d === 2 && m === 9) return { type: 'festive', name: lang === 'hi' ? 'दशहरा' : 'Dussehra', icon: '🏹' }; // Oct 2
-    if (d === 20 && m === 9) return { type: 'diwali', name: lang === 'hi' ? 'दीपावली' : 'Diwali', icon: '🪔' }; // Oct 20/21
+    if (d === 26 && m === 1) return { type: 'shivratri', name: lang === 'hi' ? 'महाशिवरात्रि' : 'Mahashivratri', icon: '🕉️' };
+    if (d === 14 && m === 2) return { type: 'holi', name: lang === 'hi' ? 'होली' : 'Holi', icon: '🎨' };
+    if (d === 31 && m === 2) return { type: 'eid', name: lang === 'hi' ? 'ईद-उल-फितर' : 'Eid-ul-Fitr', icon: '☪️' };
+    if (d === 6 && m === 5) return { type: 'bakrid', name: lang === 'hi' ? 'बकरीद' : 'Eid al-Adha', icon: '🐐' };
+    if (d === 6 && m === 6) return { type: 'muharram', name: lang === 'hi' ? 'मुहर्रम' : 'Muharram', icon: '🕌' };
+    if (d === 9 && m === 7) return { type: 'rakhi', name: lang === 'hi' ? 'रक्षा बंधन' : 'Raksha Bandhan', icon: '🎁' };
+    if (d === 16 && m === 7) return { type: 'janmashtami', name: lang === 'hi' ? 'जन्माष्टमी' : 'Janmashtami', icon: '🪈' };
+    if (d === 26 && m === 7) return { type: 'ganesh', name: lang === 'hi' ? 'गणेश चतुर्थी' : 'Ganesh Chaturthi', icon: '🐘' };
+    if (d === 5 && m === 8) return { type: 'onam', name: lang === 'hi' ? 'ओणम' : 'Onam', icon: '🌸' };
+    if (d === 5 && m === 8) return { type: 'milad', name: lang === 'hi' ? 'मिलाद-उन-नबी' : 'Milad-un-Nabi', icon: '📿' };
+    if (d === 2 && m === 9) return { type: 'festive', name: lang === 'hi' ? 'दशहरा' : 'Dussehra', icon: '🏹' };
+    if (d === 20 && m === 9) return { type: 'diwali', name: lang === 'hi' ? 'दीपावली' : 'Diwali', icon: '🪔' };
   }
 
-  // --- 2026 OVERRIDES (Verified) ---
+  // --- 2026 OVERRIDES ---
   if (y === 2026) {
-    if (d === 15 && m === 1) return { type: 'shivratri', name: lang === 'hi' ? 'महाशिवरात्रि' : 'Mahashivratri', icon: '🕉️' }; // Feb 15
-    if (d === 4 && m === 2) return { type: 'holi', name: lang === 'hi' ? 'होली' : 'Holi', icon: '🎨' }; // Mar 4
-    if (d === 20 && m === 2) return { type: 'eid', name: lang === 'hi' ? 'ईद-उल-फितर' : 'Eid-ul-Fitr', icon: '☪️' }; // Mar 20
-    if (d === 27 && m === 4) return { type: 'bakrid', name: lang === 'hi' ? 'बकरीद' : 'Eid al-Adha', icon: '🐐' }; // May 27
-    if (d === 28 && m === 7) return { type: 'rakhi', name: lang === 'hi' ? 'रक्षा बंधन' : 'Raksha Bandhan', icon: '🎁' }; // Aug 28
-    if (d === 4 && m === 8) return { type: 'janmashtami', name: lang === 'hi' ? 'जन्माष्टमी' : 'Janmashtami', icon: '🪈' }; // Sept 4
-    if (d === 14 && m === 8) return { type: 'ganesh', name: lang === 'hi' ? 'गणेश चतुर्थी' : 'Ganesh Chaturthi', icon: '🐘' }; // Sept 14
-    if (d === 20 && m === 9) return { type: 'festive', name: lang === 'hi' ? 'दशहरा' : 'Dussehra', icon: '🏹' }; // Oct 20
-    if (d === 8 && m === 10) return { type: 'diwali', name: lang === 'hi' ? 'दीपावली' : 'Diwali', icon: '🪔' }; // Nov 8
+    if (d === 15 && m === 1) return { type: 'shivratri', name: lang === 'hi' ? 'महाशिवरात्रि' : 'Mahashivratri', icon: '🕉️' };
+    if (d === 4 && m === 2) return { type: 'holi', name: lang === 'hi' ? 'होली' : 'Holi', icon: '🎨' };
+    if (d === 20 && m === 2) return { type: 'eid', name: lang === 'hi' ? 'ईद-उल-फितर' : 'Eid-ul-Fitr', icon: '☪️' };
+    if (d === 27 && m === 4) return { type: 'bakrid', name: lang === 'hi' ? 'बकरीद' : 'Eid al-Adha', icon: '🐐' };
+    if (d === 28 && m === 7) return { type: 'rakhi', name: lang === 'hi' ? 'रक्षा बंधन' : 'Raksha Bandhan', icon: '🎁' };
+    if (d === 4 && m === 8) return { type: 'janmashtami', name: lang === 'hi' ? 'जन्माष्टमी' : 'Janmashtami', icon: '🪈' };
+    if (d === 14 && m === 8) return { type: 'ganesh', name: lang === 'hi' ? 'गणेश चतुर्थी' : 'Ganesh Chaturthi', icon: '🐘' };
+    if (d === 20 && m === 9) return { type: 'festive', name: lang === 'hi' ? 'दशहरा' : 'Dussehra', icon: '🏹' };
+    if (d === 8 && m === 10) return { type: 'diwali', name: lang === 'hi' ? 'दीपावली' : 'Diwali', icon: '🪔' };
   }
 
-  // --- FALLBACK LOGIC (Approximate for other years) ---
-  // If not 2025/2026, we use the tithi math as a fallback
+  // Fallback
   if (tithiRaw === 14) return { type: 'purnima', name: lang === 'hi' ? 'पूर्णिमा' : 'Purnima', icon: '🌕' };
   if (tithiRaw === 29) return { type: 'amavasya', name: lang === 'hi' ? 'अमावस्या' : 'Amavasya', icon: '🌑' };
   if (tithiRaw === 10) return { type: 'ekadashi', name: lang === 'hi' ? 'एकादशी' : 'Ekadashi', icon: '🙏' };
