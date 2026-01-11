@@ -1,6 +1,6 @@
 import { DATA } from '../data/constants';
 
-// ... (Keep calculatePanchang existing code) ...
+// --- PANCHANG CALCULATION ---
 export const calculatePanchang = (date) => {
   const J2000 = 2451545.0;
   const toJulian = (d) => (d.getTime() / 86400000) - (d.getTimezoneOffset() / 1440) + 2440587.5;
@@ -41,7 +41,7 @@ export const calculatePanchang = (date) => {
   };
 };
 
-// ... (Keep getHindiMonthIndex existing code) ...
+// --- HINDI MONTH ---
 export const getHindiMonthIndex = (date) => {
   const m = date.getMonth();
   const d = date.getDate();
@@ -50,19 +50,26 @@ export const getHindiMonthIndex = (date) => {
   return (m + offset) % 12; 
 };
 
-// ... (Keep getChoghadiya existing code) ...
+// --- CHOGHADIYA (The Fixed Function) ---
 export const getChoghadiya = (date, lang) => {
-  const day = date.getDay(); 
+  const day = date.getDay(); // 0 Sun, 6 Sat
   const sequences = [
-    ['udveg', 'chal', 'labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg'], 
-    ['amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit'], 
-    ['rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal', 'shubh', 'rog'],   
-    ['labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh'],   
-    ['shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal', 'shubh'], 
-    ['chal', 'labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal'],   
-    ['kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal']    
+    ['udveg', 'chal', 'labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg'], // Sun
+    ['amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit'], // Mon
+    ['rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal', 'shubh', 'rog'],   // Tue
+    ['labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh'],   // Wed
+    ['shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal', 'shubh'], // Thu
+    ['chal', 'labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal'],   // Fri
+    ['kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal']    // Sat
   ];
-  const slots = ["06:00 - 07:30", "07:30 - 09:00", "09:00 - 10:30", "10:30 - 12:00", "12:00 - 01:30", "01:30 - 03:00", "03:00 - 04:30", "04:30 - 06:00"];
+
+  const seq = sequences[day]; // <--- THIS WAS MISSING
+  
+  const slots = [
+    "06:00 - 07:30", "07:30 - 09:00", "09:00 - 10:30", "10:30 - 12:00",
+    "12:00 - 01:30", "01:30 - 03:00", "03:00 - 04:30", "04:30 - 06:00"
+  ];
+
   return slots.map((time, i) => {
     const type = seq[i];
     const label = DATA[lang].choghadiya[type];
@@ -73,7 +80,7 @@ export const getChoghadiya = (date, lang) => {
   });
 };
 
-// ... (Keep getDayTheme existing code) ...
+// --- DAY THEME (Festivals) ---
 export const getDayTheme = (date, panchang, monthIdx, lang) => {
   const d = date.getDate();
   const m = date.getMonth(); 
@@ -121,7 +128,7 @@ export const getDayTheme = (date, panchang, monthIdx, lang) => {
   return null;
 };
 
-// --- NEW FUNCTION: Get Auspicious/Inauspicious Times ---
+// --- RAHU KAAL & YAMAGANDA ---
 export const getAuspiciousTimes = (date, sunTimes) => {
   if (!sunTimes) return null;
   
