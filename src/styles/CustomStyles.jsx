@@ -38,19 +38,18 @@ const CustomStyles = () => (
     .theme-janmashtami { background: linear-gradient(135deg, #ccfbf1 0%, #e0f2fe 100%); border-color: #0d9488; }
     .theme-valentine { background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); }
     
-    /* --- NEW MUSLIM THEMES --- */
-    /* Eid ul-Fitr (already existed, refined) */
+    /* New Muslim Themes */
     .theme-eid { background: linear-gradient(135deg, #f0fdf4 0%, #ecfccb 100%); border-left: 3px solid #166534; }
-    
-    /* Eid al-Adha (Bakrid) - Deep Green and Gold for sacrifice/solemnity */
     .theme-bakrid { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-color: #15803d; border-right: 3px solid #b45309; }
-    
-    /* Muharram - Somber, darker green/black hint */
     .theme-muharram { background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border-left: 3px solid #000000; }
-    
-    /* Milad-un-Nabi - Light, peaceful green */
     .theme-milad { background: linear-gradient(135deg, #ecfccb 0%, #f7fee7 100%); border-color: #84cc16; }
 
+    /* New Year Theme */
+    .theme-newyear {
+      background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 100%);
+      border: 1px solid #6366f1;
+      border-left: 3px solid #4f46e5;
+    }
   `}</style>
 );
 
