@@ -117,8 +117,10 @@ const App = () => {
           })}
         </div>
         
-        <div className="p-4 bg-gray-50 text-center text-xs text-gray-400 border-t border-gray-200 uppercase tracking-widest">
-           Digital Panchang • {lang === 'hi' ? 'भारतीय कैलेंडर' : 'Indian Calendar'} • 2024-2025
+        <div className="p-4 bg-gray-50 text-center text-xs text-gray-400 border-t border-gray-200 uppercase tracking-widest flex items-center justify-center gap-2">
+           <span>Digital Panchang</span>
+           <span>•</span>
+           <span>Made with ❤️ in India</span>
         </div>
       </div>
 
