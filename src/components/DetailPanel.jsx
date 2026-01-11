@@ -1,8 +1,40 @@
-import React, { useState } from 'react';
-import { X, Sun, Moon, Calendar as CalendarIcon, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Sun, Moon, Calendar as CalendarIcon, Clock, MapPin, Share2 } from 'lucide-react';
+import SunCalc from 'suncalc';
 import { DATA, NAKSHATRAS_EN, NAKSHATRAS_HI } from '../data/constants';
 import { calculatePanchang, getHindiMonthIndex, getDayTheme, getChoghadiya } from '../utils/helpers';
 import Confetti from './Confetti';
+
+// Visual Moon Widget Component
+const MoonPhaseVisual = ({ tithiRaw }) => {
+  // 0-14: Shukla (Waxing), 15-29: Krishna (Waning)
+  // We approximate the phase for visual representation
+  const isWaxing = tithiRaw < 15;
+  const phase = isWaxing ? tithiRaw / 15 : (30 - tithiRaw) / 15;
+  
+  // Calculate mask position
+  // This is a simplified visual representation
+  const maskX = isWaxing ? -50 + (phase * 100) : 50 - (phase * 100);
+  
+  return (
+    <div className="flex flex-col items-center justify-center p-4 bg-gray-900 rounded-xl text-white">
+      <div className="relative w-16 h-16 rounded-full bg-gray-700 overflow-hidden shadow-inner border border-gray-600">
+        <div 
+          className="absolute inset-0 bg-yellow-100 rounded-full transition-all duration-500"
+          style={{ 
+            opacity: phase,
+            transform: `scale(${0.2 + (phase * 0.8)})` 
+          }}
+        />
+        {/* Shine effect */}
+        <div className="absolute top-0 right-0 w-8 h-8 bg-white opacity-20 blur-md rounded-full" />
+      </div>
+      <span className="text-xs font-medium mt-2 text-gray-300 uppercase tracking-widest">
+        {isWaxing ? 'Waxing' : 'Waning'} • {Math.round(phase * 100)}%
+      </span>
+    </div>
+  );
+};
 
 const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
   const t = DATA[lang];
@@ -12,16 +44,71 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
   const [note, setNote] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
   
+  // Location State
+  const [location, setLocation] = useState(null);
+  const [sunTimes, setSunTimes] = useState(null);
+  const [locLoading, setLocLoading] = useState(false);
+
   const nakshatraName = lang === 'hi' ? NAKSHATRAS_HI[panchang.nakshatraIndex] : NAKSHATRAS_EN[panchang.nakshatraIndex];
   const monthName = t.hindiMonths[hindiMonthIdx];
   const tithiName = t.tithis[panchang.tithiDisplayIndex];
   const pakshaName = t.paksha[panchang.paksha];
   const choghadiya = getChoghadiya(date, lang);
 
-  // --- NEW: RELATIVE DATE LOGIC ---
+  // Load Location
+  useEffect(() => {
+    // Default Fallback (Central India - Indore)
+    const defaultLoc = { lat: 22.7196, lng: 75.8577 }; 
+    
+    if (navigator.geolocation) {
+      setLocLoading(true);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          setLocation(loc);
+          setSunTimes(SunCalc.getTimes(date, loc.lat, loc.lng));
+          setLocLoading(false);
+        },
+        () => {
+          // Denied/Error -> Use Default
+          setLocation(null); // Indicates using approximation
+          setSunTimes(SunCalc.getTimes(date, defaultLoc.lat, defaultLoc.lng));
+          setLocLoading(false);
+        }
+      );
+    } else {
+      setSunTimes(SunCalc.getTimes(date, defaultLoc.lat, defaultLoc.lng));
+    }
+  }, [date]);
+
+  const formatTime = (dateObj) => {
+    if (!dateObj) return "--:--";
+    let h = dateObj.getHours();
+    const m = dateObj.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12;
+    h = h ? h : 12;
+    return `${h}:${m.toString().padStart(2, '0')} ${ampm}`;
+  };
+
+  // Google Calendar Link Generator
+  const addToGoogleCalendar = () => {
+    const title = theme ? theme.name : `Panchang: ${tithiName}`;
+    const desc = `${tithiName}, ${pakshaName} Paksha. Nakshatra: ${nakshatraName}.`;
+    
+    const start = new Date(date);
+    start.setHours(9, 0, 0); // Default 9 AM
+    const end = new Date(date);
+    end.setHours(10, 0, 0);
+
+    const fmt = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, "");
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmt(start)}/${fmt(end)}&details=${encodeURIComponent(desc)}`;
+    
+    window.open(url, '_blank');
+  };
+
   const getRelativeLabel = (targetDate) => {
     const now = new Date();
-    // Reset time to midnight for accurate day comparison
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const target = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
     
@@ -29,7 +116,6 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) return t.ui.today;
-    
     if (lang === 'hi') {
       if (diffDays === 1) return "कल (आने वाला)";
       if (diffDays === -1) return "कल (बीता हुआ)";
@@ -44,21 +130,12 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
   };
 
   const relativeLabel = getRelativeLabel(date);
-  const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
-  const varMins = -45 * Math.cos((dayOfYear + 10) * 2 * Math.PI / 365);
-  const formatTime = (mins) => {
-    const h = Math.floor(mins / 60);
-    const m = Math.floor(mins % 60);
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    return `${h % 12 || 12}:${m.toString().padStart(2, '0')} ${ampm}`;
-  };
-
   const isFestive = theme && ['national', 'diwali', 'holi', 'rakhi', 'ganesh', 'onam', 'navratri', 'christmas', 'eid', 'bakrid', 'muharram', 'milad', 'newyear'].includes(theme.type);
 
   const getHeaderGradient = () => {
     if (!theme) return 'bg-gradient-to-br from-gray-900 to-gray-800';
     switch(theme.type) {
-      case 'newyear': return 'bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700'; // New Year Theme
+      case 'newyear': return 'bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700';
       case 'national': return 'bg-gradient-to-r from-orange-500 via-white to-green-600';
       case 'holi': return 'bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500';
       case 'ganesh': return 'bg-gradient-to-br from-orange-500 to-red-600';
@@ -94,7 +171,6 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
           <div className="flex items-center gap-2 mt-4 opacity-80 text-sm uppercase tracking-widest">
             <span>{t.weekdays[date.getDay()]}</span>
             <span>•</span>
-            {/* UPDATED HEADER TEXT LOGIC */}
             <span className="font-semibold">{theme ? theme.name : relativeLabel}</span>
           </div>
         </div>
@@ -122,23 +198,43 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
       <div className="flex-1 overflow-y-auto bg-gray-50/50 p-6">
         {activeTab === 'overview' && (
           <div className="space-y-6 animate-fade-in">
+             {/* Quick Stats */}
              <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
                    <Sun size={24} className="text-orange-500 mb-2" />
                    <span className="text-xs text-gray-500 uppercase">{t.ui.sunrise}</span>
-                   <span className="font-bold text-gray-800">{formatTime(6 * 60 + 30 + varMins)}</span>
+                   <span className="font-bold text-gray-800">{sunTimes ? formatTime(sunTimes.sunrise) : '--:--'}</span>
                 </div>
                 <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
                    <Moon size={24} className="text-indigo-500 mb-2" />
                    <span className="text-xs text-gray-500 uppercase">{t.ui.sunset}</span>
-                   <span className="font-bold text-gray-800">{formatTime(18 * 60 + 15 - varMins)}</span>
+                   <span className="font-bold text-gray-800">{sunTimes ? formatTime(sunTimes.sunset) : '--:--'}</span>
                 </div>
              </div>
 
+             {/* Location Badge */}
+             <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
+               <MapPin size={12} />
+               {locLoading ? 
+                 <span>Locating...</span> : 
+                 location ? <span>Using GPS Time</span> : <span>Estimated Time (Indore)</span>
+               }
+             </div>
+
              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h3 className={`text-gray-800 font-bold mb-4 flex items-center gap-2 ${lang === 'hi' ? 'font-hindi' : 'font-eng'}`}>
-                <CalendarIcon size={18} className="text-blue-600" /> {t.ui.events}
-              </h3>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className={`text-gray-800 font-bold flex items-center gap-2 ${lang === 'hi' ? 'font-hindi' : 'font-eng'}`}>
+                  <CalendarIcon size={18} className="text-blue-600" /> {t.ui.events}
+                </h3>
+                <button 
+                  onClick={addToGoogleCalendar}
+                  className="text-blue-600 hover:bg-blue-50 p-2 rounded-full transition-colors"
+                  title="Add to Google Calendar"
+                >
+                  <Share2 size={16} />
+                </button>
+              </div>
+
               <div className="space-y-3 mb-4">
                 {events && events.length > 0 ? (
                   events.map((evt, i) => (
@@ -172,10 +268,17 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
         )}
 
         {activeTab === 'panchang' && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-fade-in">
-            <h3 className={`text-orange-600 font-bold mb-6 flex items-center gap-2 ${lang === 'hi' ? 'font-hindi' : 'font-eng'}`}>
-              <Sun size={18} /> Panchang Details
-            </h3>
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-fade-in space-y-6">
+            
+            <div className="flex items-center justify-between">
+              <h3 className={`text-orange-600 font-bold flex items-center gap-2 ${lang === 'hi' ? 'font-hindi' : 'font-eng'}`}>
+                <Sun size={18} /> Panchang
+              </h3>
+            </div>
+
+            {/* VISUAL MOON WIDGET */}
+            <MoonPhaseVisual tithiRaw={panchang.tithiRaw} />
+
             <div className={`space-y-6 ${lang === 'hi' ? 'font-hindi' : 'font-eng'}`}>
               <div className="flex justify-between items-center border-b border-gray-50 pb-3">
                 <span className="text-gray-500 text-sm">{t.ui.tithi}</span>
