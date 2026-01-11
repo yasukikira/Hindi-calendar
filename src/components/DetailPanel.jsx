@@ -16,9 +16,34 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
   const monthName = t.hindiMonths[hindiMonthIdx];
   const tithiName = t.tithis[panchang.tithiDisplayIndex];
   const pakshaName = t.paksha[panchang.paksha];
-
   const choghadiya = getChoghadiya(date, lang);
 
+  // --- NEW: RELATIVE DATE LOGIC ---
+  const getRelativeLabel = (targetDate) => {
+    const now = new Date();
+    // Reset time to midnight for accurate day comparison
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const target = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+    
+    const diffTime = target - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return t.ui.today;
+    
+    if (lang === 'hi') {
+      if (diffDays === 1) return "कल (आने वाला)";
+      if (diffDays === -1) return "कल (बीता हुआ)";
+      if (diffDays > 0) return `${diffDays} दिन बाद`;
+      return `${Math.abs(diffDays)} दिन पहले`;
+    } else {
+      if (diffDays === 1) return "Tomorrow";
+      if (diffDays === -1) return "Yesterday";
+      if (diffDays > 0) return `In ${diffDays} days`;
+      return `${Math.abs(diffDays)} days ago`;
+    }
+  };
+
+  const relativeLabel = getRelativeLabel(date);
   const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
   const varMins = -45 * Math.cos((dayOfYear + 10) * 2 * Math.PI / 365);
   const formatTime = (mins) => {
@@ -28,12 +53,12 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
     return `${h % 12 || 12}:${m.toString().padStart(2, '0')} ${ampm}`;
   };
 
-  const isFestive = theme && ['national', 'diwali', 'holi', 'rakhi', 'ganesh', 'onam', 'navratri', 'christmas', 'eid', 'bakrid', 'muharram', 'milad'].includes(theme.type);
+  const isFestive = theme && ['national', 'diwali', 'holi', 'rakhi', 'ganesh', 'onam', 'navratri', 'christmas', 'eid', 'bakrid', 'muharram', 'milad', 'newyear'].includes(theme.type);
 
-  // Helper to determine header gradient based on theme
   const getHeaderGradient = () => {
     if (!theme) return 'bg-gradient-to-br from-gray-900 to-gray-800';
     switch(theme.type) {
+      case 'newyear': return 'bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700'; // New Year Theme
       case 'national': return 'bg-gradient-to-r from-orange-500 via-white to-green-600';
       case 'holi': return 'bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500';
       case 'ganesh': return 'bg-gradient-to-br from-orange-500 to-red-600';
@@ -41,9 +66,9 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
       case 'onam': return 'bg-gradient-to-r from-emerald-500 to-yellow-400';
       case 'sankranti': return 'bg-gradient-to-r from-yellow-400 to-orange-500';
       case 'eid': return 'bg-gradient-to-r from-green-600 to-emerald-800';
-      case 'bakrid': return 'bg-gradient-to-r from-green-700 to-yellow-600'; // New
-      case 'muharram': return 'bg-gradient-to-r from-gray-700 to-gray-900'; // New
-      case 'milad': return 'bg-gradient-to-r from-lime-500 to-green-600'; // New
+      case 'bakrid': return 'bg-gradient-to-r from-green-700 to-yellow-600';
+      case 'muharram': return 'bg-gradient-to-r from-gray-700 to-gray-900';
+      case 'milad': return 'bg-gradient-to-r from-lime-500 to-green-600';
       case 'christmas': return 'bg-gradient-to-r from-red-600 to-green-700';
       case 'shivratri': return 'bg-gradient-to-br from-indigo-900 to-slate-900';
       case 'navratri': return 'bg-gradient-to-r from-fuchsia-600 to-purple-600';
@@ -55,11 +80,7 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
 
   return (
     <div className="fixed inset-y-0 right-0 w-full md:w-[400px] bg-white shadow-2xl z-50 animate-slide-in flex flex-col font-sans">
-      {/* Header */}
-      <div className={`
-        relative p-6 text-white overflow-hidden shrink-0 transition-colors duration-500
-        ${getHeaderGradient()}
-      `}>
+      <div className={`relative p-6 text-white overflow-hidden shrink-0 transition-colors duration-500 ${getHeaderGradient()}`}>
         {isFestive && <Confetti />}
         <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
         <button onClick={onClose} className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 rounded-full backdrop-blur-sm transition-colors z-20">
@@ -69,15 +90,16 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
         <div className={`relative z-10 ${['national', 'sankranti'].includes(theme?.type) ? 'text-gray-900' : 'text-white'}`}>
           <h2 className="text-6xl font-bold tracking-tighter mb-1">{date.getDate()}</h2>
           <p className="text-xl opacity-90 font-medium">{t.months[date.getMonth()]} {date.getFullYear()}</p>
+          
           <div className="flex items-center gap-2 mt-4 opacity-80 text-sm uppercase tracking-widest">
             <span>{t.weekdays[date.getDay()]}</span>
             <span>•</span>
-            <span>{theme ? theme.name : t.ui.today}</span>
+            {/* UPDATED HEADER TEXT LOGIC */}
+            <span className="font-semibold">{theme ? theme.name : relativeLabel}</span>
           </div>
         </div>
       </div>
 
-      {/* Navigation Tabs */}
       <div className="flex border-b border-gray-100 bg-white">
         {['overview', 'panchang', 'muhurat'].map((tab) => (
           <button
@@ -97,10 +119,7 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
         ))}
       </div>
 
-      {/* Tab Content */}
       <div className="flex-1 overflow-y-auto bg-gray-50/50 p-6">
-        
-        {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div className="space-y-6 animate-fade-in">
              <div className="grid grid-cols-2 gap-4">
@@ -152,7 +171,6 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
           </div>
         )}
 
-        {/* PANCHANG TAB */}
         {activeTab === 'panchang' && (
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-fade-in">
             <h3 className={`text-orange-600 font-bold mb-6 flex items-center gap-2 ${lang === 'hi' ? 'font-hindi' : 'font-eng'}`}>
@@ -183,7 +201,6 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
           </div>
         )}
 
-        {/* MUHURAT TAB */}
         {activeTab === 'muhurat' && (
            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-fade-in">
              <h3 className={`text-purple-600 font-bold mb-4 flex items-center gap-2 ${lang === 'hi' ? 'font-hindi' : 'font-eng'}`}>
@@ -202,7 +219,6 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, lang }) => {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );
