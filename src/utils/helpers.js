@@ -1,43 +1,28 @@
-import { DATA, MUHURAT_DATES } from '../data/constants';
+import { DATA } from '../data/constants';
 
 export const calculatePanchang = (date) => {
   const J2000 = 2451545.0;
   const toJulian = (d) => (d.getTime() / 86400000) - (d.getTimezoneOffset() / 1440) + 2440587.5;
   const normalize = (deg) => { let a = deg % 360; return a < 0 ? a + 360 : a; };
-
   const jd = toJulian(date);
   const D = jd - J2000;
-  
   const L = normalize(280.460 + 0.9856474 * D);
   const g = normalize(357.528 + 0.9856003 * D);
   const lambdaSun = normalize(L + 1.915 * Math.sin(g * Math.PI / 180));
-  
   const l = normalize(218.316 + 13.176396 * D);
   const mm = normalize(134.963 + 13.064993 * D);
   const lambdaMoon = normalize(l + 6.289 * Math.sin(mm * Math.PI / 180));
-
   let diff = lambdaMoon - lambdaSun;
   if (diff < 0) diff += 360;
-
   const tithiRaw = Math.floor(diff / 12);
   const nakshatraIndex = Math.floor(lambdaMoon / (360 / 27));
   const yogaIndex = Math.floor((lambdaSun + lambdaMoon) / (360 / 27));
-  
   const isShukla = tithiRaw < 15;
   const tithiIndex = tithiRaw % 15;
-  
   let tithiDisplayIndex = tithiIndex;
   if (isShukla && tithiIndex === 14) tithiDisplayIndex = 14; 
   if (!isShukla && tithiIndex === 14) tithiDisplayIndex = 15; 
-
-  return {
-    tithiRaw,
-    tithiDisplayIndex,
-    nakshatraIndex,
-    yogaIndex,
-    paksha: isShukla ? 'shukla' : 'krishna',
-    vikramSamvat: date.getFullYear() + 57
-  };
+  return { tithiRaw, tithiDisplayIndex, nakshatraIndex, yogaIndex, paksha: isShukla ? 'shukla' : 'krishna', vikramSamvat: date.getFullYear() + 57 };
 };
 
 export const getHindiMonthIndex = (date) => {
@@ -59,10 +44,8 @@ export const getChoghadiya = (date, lang) => {
     ['chal', 'labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal'],   
     ['kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal']    
   ];
-
   const seq = sequences[day];
   const slots = ["06:00 - 07:30", "07:30 - 09:00", "09:00 - 10:30", "10:30 - 12:00", "12:00 - 01:30", "01:30 - 03:00", "03:00 - 04:30", "04:30 - 06:00"];
-
   return slots.map((time, i) => {
     const type = seq[i];
     const labelData = DATA[lang] || DATA['en']; 
@@ -74,6 +57,13 @@ export const getChoghadiya = (date, lang) => {
   });
 };
 
+const isDateInRange = (d, m, y, startD, startM, endD, endM) => {
+  if (m === startM && d >= startD && d <= endD) return true;
+  if (m === startM && m !== endM && d >= startD) return true; 
+  if (m === endM && m !== startM && d <= endD) return true;   
+  return false;
+};
+
 export const getDayTheme = (date, panchang, monthIdx, lang) => {
   const d = date.getDate();
   const m = date.getMonth(); 
@@ -81,19 +71,22 @@ export const getDayTheme = (date, panchang, monthIdx, lang) => {
   const { tithiRaw } = panchang;
   const tData = DATA[lang] || DATA['en'];
 
-  // --- FIXED DATE FESTIVALS ---
   if (d === 1 && m === 0) return { type: 'newyear', name: lang === 'hi' ? 'नव वर्ष' : 'New Year', icon: '🎉' };
   
-  // National Holidays (Crucial Fix: type 'national' matches CSS .theme-national)
   if (d === 26 && m === 0) return { type: 'national', name: lang === 'hi' ? 'गणतंत्र दिवस' : 'Republic Day', icon: '🇮🇳' };
   if (d === 15 && m === 7) return { type: 'national', name: lang === 'hi' ? 'स्वतंत्रता दिवस' : 'Independence Day', icon: '🇮🇳' };
   if (d === 2 && m === 9) return { type: 'national', name: lang === 'hi' ? 'गांधी जयंती' : 'Gandhi Jayanti', icon: '🕊️' };
+  if (d === 14 && m === 3) return { type: 'national', name: lang === 'hi' ? 'अम्बेडकर जयंती' : 'Ambedkar Jayanti', icon: '⚖️' };
   
   if (d === 14 && m === 0) return { type: 'sankranti', name: lang === 'hi' ? 'मकर संक्रांति' : 'Makar Sankranti', icon: '🪁' };
   if (d === 14 && m === 1) return { type: 'valentine', name: lang === 'hi' ? 'वैलेंटाइन्स डे' : "Valentine's Day", icon: '💖' };
   if (d === 25 && m === 11) return { type: 'christmas', name: lang === 'hi' ? 'क्रिसमस' : 'Christmas', icon: '🎄' };
 
-  // --- DYNAMIC DATES (2025/2026) ---
+  if (y === 2026 && isDateInRange(d, m, y, 19, 2, 27, 2)) return { type: 'navratri', name: lang === 'hi' ? 'चैत्र नवरात्रि' : 'Chaitra Navratri', icon: '🔱' };
+  if (y === 2026 && isDateInRange(d, m, y, 11, 9, 20, 9)) return { type: 'navratri', name: lang === 'hi' ? 'शारदीय नवरात्रि' : 'Sharad Navratri', icon: '🕉️' };
+  if (y === 2025 && ((m===2 && d>=30) || (m===3 && d<=6))) return { type: 'navratri', name: lang === 'hi' ? 'चैत्र नवरात्रि' : 'Chaitra Navratri', icon: '🔱' };
+  if (y === 2025 && ((m===8 && d>=22) || (m===9 && d<=2))) return { type: 'navratri', name: lang === 'hi' ? 'शारदीय नवरात्रि' : 'Sharad Navratri', icon: '🕉️' };
+
   const festivals = {
     2025: {
       '1-26': { type: 'shivratri', name: 'Mahashivratri', icon: '🕉️' },
@@ -124,22 +117,16 @@ export const getDayTheme = (date, panchang, monthIdx, lang) => {
   const key = `${m}-${d}`;
   if (festivals[y] && festivals[y][key]) {
     const f = festivals[y][key];
-    // Simple localization check
     return { ...f, name: (lang === 'hi' || lang === 'mr') ? getHindiName(f.name) : f.name };
   }
 
-  // --- TITHI BASED FALLBACK ---
-  // Purnima (Full Moon) - Crucial for visual fix
   if (tithiRaw === 14) return { type: 'purnima', name: tData.tithis[14], icon: '🌕' };
-  // Amavasya (New Moon)
   if (tithiRaw === 29) return { type: 'amavasya', name: tData.tithis[15], icon: '🌑' };
-  // Ekadashi
   if (tithiRaw === 10) return { type: 'ekadashi', name: tData.tithis[10], icon: '🙏' };
 
   return null;
 };
 
-// Helper to keep helper clean
 function getHindiName(enName) {
   const map = {
     'Mahashivratri': 'महाशिवरात्रि', 'Holi': 'होली', 'Eid-ul-Fitr': 'ईद-उल-फितर',
@@ -159,7 +146,6 @@ export const getAuspiciousTimes = (date, sunTimes) => {
   const day = date.getDay();
   const rahuMap = [8, 2, 7, 5, 6, 4, 3]; 
   const yamaMap = [5, 4, 3, 2, 1, 7, 6]; 
-
   const getSlot = (partIndex) => {
     const s = new Date(start + (partIndex - 1) * part);
     const e = new Date(start + partIndex * part);
