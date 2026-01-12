@@ -56,15 +56,22 @@ const CustomStyles = () => (
       color: #e2e8f0;
       overflow-x: hidden;
     }
+    /* Dark Mode Overrides for Tailwind Classes */
     .dark-mode .bg-white { background-color: #1e293b; color: #f1f5f9; border-color: #334155; }
     .dark-mode .text-gray-900 { color: #f1f5f9; }
     .dark-mode .text-gray-800 { color: #e2e8f0; }
+    
+    /* CRITICAL FIXES FOR READABILITY */
+    .dark-mode .text-gray-700 { color: #cbd5e1; } /* Lighter gray for dates */
     .dark-mode .text-gray-600 { color: #94a3b8; }
     .dark-mode .text-gray-500 { color: #94a3b8; }
+    .dark-mode .text-red-500 { color: #f87171; } /* Brighter red for Sunday */
+    
     .dark-mode .bg-gray-50 { background-color: #0f172a; }
     .dark-mode .bg-gray-100 { background-color: #1e293b; }
     .dark-mode .border-gray-100, .dark-mode .border-gray-200 { border-color: #334155; }
     
+    /* Stars & Constellation Background */
     .stars-bg {
       position: absolute; inset: 0; pointer-events: none;
       background-image: 
