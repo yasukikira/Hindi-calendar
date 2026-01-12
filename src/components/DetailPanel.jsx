@@ -99,31 +99,40 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, onDeleteEvent, lang, d
     return diffDays > 0 ? `${diffDays} ${dayWord}` : `${Math.abs(diffDays)} ${dayWord}`;
   };
 
-  // RESTORED: Standard Day Theme
-  // If no specific theme is found, use 'theme-default' (Dark gradient)
+  // HEADER CLASS LOGIC (Fixed for cool dark background on normal days)
   const headerClass = theme ? `theme-${theme.type}` : 'theme-default';
   
-  // FIX: Identify light themes to force black text
+  // TEXT COLOR LOGIC (Fixed for visibility on light themes like Purnima)
   const isLightTheme = theme && ['purnima', 'national', 'sankranti', 'diwali', 'ganesh', 'rakhi', 'holi', 'festive', 'christmas', 'newyear'].includes(theme.type);
-  
-  // If no theme (default) -> text should be WHITE (because background is dark gradient)
-  // If theme is Purnima -> text should be BLACK
-  const textColor = (isLightTheme) ? 'text-gray-900' : 'text-white';
-  const closeBtnColor = (isLightTheme) ? 'bg-black/10 hover:bg-black/20 text-gray-900' : 'bg-black/20 hover:bg-black/40 text-white';
+  const textColor = isLightTheme ? 'text-gray-900' : 'text-white';
+  const closeBtnColor = isLightTheme ? 'bg-black/10 hover:bg-black/20 text-gray-900' : 'bg-black/20 hover:bg-black/40 text-white';
 
   return (
     <div className={`fixed inset-y-0 right-0 w-full md:w-[400px] shadow-2xl z-50 animate-slide-in flex flex-col font-sans ${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
+      
+      {/* CRITICAL FIX: 
+          1. Removed hardcoded 'text-white'
+          2. Applies 'headerClass' (which can be 'theme-default' for dark gradient)
+          3. Applies 'textColor' (which is dynamically black or white)
+      */}
       <div className={`relative p-6 overflow-hidden shrink-0 transition-colors duration-500 ${headerClass} ${textColor}`}>
         {theme && ['national', 'diwali', 'holi', 'rakhi', 'ganesh', 'onam', 'navratri', 'christmas', 'eid', 'bakrid', 'muharram', 'milad', 'newyear', 'sankranti'].includes(theme.type) && <Confetti />}
-        <button onClick={onClose} className={`absolute top-4 right-4 p-2 rounded-full backdrop-blur-sm transition-colors z-20 ${closeBtnColor}`}><X size={20} /></button>
+        
+        <button onClick={onClose} className={`absolute top-4 right-4 p-2 rounded-full backdrop-blur-sm transition-colors z-20 ${closeBtnColor}`}>
+          <X size={20} />
+        </button>
+
         <div className="relative z-10">
           <h2 className="text-6xl font-bold tracking-tighter mb-1 drop-shadow-md">{date.getDate()}</h2>
           <p className="text-xl opacity-90 font-medium drop-shadow-sm">{t.months[date.getMonth()]} {date.getFullYear()}</p>
           <div className="flex items-center gap-2 mt-4 opacity-90 text-sm uppercase tracking-widest font-bold">
-            <span>{t.weekdays[date.getDay()]}</span><span>•</span><span>{theme ? theme.name : getRelativeLabel(date)}</span>
+            <span>{t.weekdays[date.getDay()]}</span>
+            <span>•</span>
+            <span>{theme ? theme.name : getRelativeLabel(date)}</span>
           </div>
         </div>
       </div>
+
       <div className={`flex border-b ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
         {['overview', 'panchang', 'muhurat'].map((tab) => (
           <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 py-3 text-sm font-medium transition-colors relative ${activeTab === tab ? 'text-orange-500 bg-orange-500/10' : 'text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'} ${lang !== 'en' ? 'font-hindi' : 'font-eng'}`}>
@@ -132,6 +141,7 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, onDeleteEvent, lang, d
           </button>
         ))}
       </div>
+
       <div className={`flex-1 overflow-y-auto p-6 ${darkMode ? 'bg-gray-900 text-gray-200' : 'bg-gray-50/50 text-gray-800'}`}>
         {activeTab === 'overview' && (
           <div className="space-y-6 animate-fade-in">
