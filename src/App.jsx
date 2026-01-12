@@ -14,7 +14,6 @@ const App = () => {
   const [showMuhuratModal, setShowMuhuratModal] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   
-  // States for Lang & Dark Mode
   const [lang, setLang] = useState(() => localStorage.getItem('hindiCalendarLang') || 'en');
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('hindiCalendarTheme') === 'dark');
 
@@ -23,24 +22,14 @@ const App = () => {
 
   const toggleDarkMode = () => setDarkMode(!darkMode);
 
-  // Animation Handler
   const handleTransition = (callback) => {
     setIsAnimating(true);
-    setTimeout(() => {
-      callback();
-      setTimeout(() => setIsAnimating(false), 300);
-    }, 100);
+    setTimeout(() => { callback(); setTimeout(() => setIsAnimating(false), 300); }, 100);
   };
-
-  // Safe Language Switcher with Animation
-  const handleLangChange = (newLang) => {
-    handleTransition(() => setLang(newLang));
-  };
-
+  const handleLangChange = (newLang) => handleTransition(() => setLang(newLang));
   const changeMonth = (delta) => handleTransition(() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + delta, 1)));
   const handleDateJump = (newDate) => handleTransition(() => { setCurrentDate(newDate); setSelectedDate(newDate); });
   const goToToday = () => handleTransition(() => { const now = new Date(); setCurrentDate(now); setSelectedDate(now); });
-  
   const handleAddEvent = (txt) => {
     if (!selectedDate || !txt.trim()) return;
     const key = selectedDate.toDateString();
@@ -55,7 +44,6 @@ const App = () => {
     const firstDay = new Date(y, m, 1).getDay();
     const daysInMonth = new Date(y, m + 1, 0).getDate();
     const daysInPrev = new Date(y, m, 0).getDate();
-    
     const days = [];
     for (let i = firstDay - 1; i >= 0; i--) days.push({ d: new Date(y, m - 1, daysInPrev - i), current: false });
     for (let i = 1; i <= daysInMonth; i++) days.push({ d: new Date(y, m, i), current: true });
@@ -67,9 +55,10 @@ const App = () => {
   return (
     <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'dark-mode bg-gray-900' : 'bg-[#f8f9fa] text-gray-900'} ${lang !== 'en' ? 'font-hindi' : 'font-eng'}`}>
       <CustomStyles />
+      {/* THIS IS THE NIGHT SKY BACKGROUND */}
       {darkMode && <div className="stars-bg"></div>}
 
-      <div className={`max-w-6xl mx-auto min-h-screen flex flex-col shadow-2xl border-x ${darkMode ? 'border-gray-800 bg-gray-900' : 'border-gray-100 bg-white'} relative z-10`}>
+      <div className={`max-w-6xl mx-auto min-h-screen flex flex-col shadow-2xl border-x ${darkMode ? 'border-gray-800 bg-gray-900/90' : 'border-gray-100 bg-white'} relative z-10`}>
         <CalendarHeader 
           date={currentDate} 
           lang={lang} 
@@ -83,8 +72,8 @@ const App = () => {
         />
 
         <div className={`px-4 py-2 border-b ${darkMode ? 'border-gray-800 bg-gray-800/50' : 'border-gray-100 bg-orange-50'} flex justify-between items-center`}>
-          <span className="text-xs font-bold uppercase tracking-widest text-orange-600">{t.ui.muhuratFor || "Muhurats"} 2026</span>
-          <button onClick={() => setShowMuhuratModal(true)} className="text-xs font-bold underline decoration-orange-400 decoration-2 underline-offset-4 hover:text-orange-700">
+          <span className="text-xs font-bold uppercase tracking-widest text-orange-500">{t.ui.muhuratFor || "Muhurats"} 2026</span>
+          <button onClick={() => setShowMuhuratModal(true)} className="text-xs font-bold underline decoration-orange-400 decoration-2 underline-offset-4 hover:text-orange-600">
             {t.ui.find || "Find Dates"} →
           </button>
         </div>
