@@ -13,7 +13,7 @@ const Nebula = () => {
             <meshBasicMaterial 
               color={i % 2 === 0 ? "#4338ca" : "#581c87"} 
               transparent 
-              opacity={0.08} 
+              opacity={0.15} // Boosted for mobile visibility
               blending={THREE.AdditiveBlending} 
               depthWrite={false}
             />
@@ -53,8 +53,8 @@ const Constellations = () => {
   const ref = useRef();
   useFrame((state, delta) => {
     if (ref.current) {
-      ref.current.rotation.y += delta * 0.03;
-      ref.current.rotation.x += delta * 0.01;
+      ref.current.rotation.y += delta * 0.02;
+      ref.current.rotation.x += delta * 0.005;
     }
   });
 
@@ -64,13 +64,14 @@ const Constellations = () => {
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" count={lines.length} array={new Float32Array(lines.flatMap(v => [v.x, v.y, v.z]))} itemSize={3} />
         </bufferGeometry>
-        <lineBasicMaterial color="#ffffff" opacity={0.12} transparent />
+        <lineBasicMaterial color="#ffffff" opacity={0.2} transparent linewidth={2} />
       </lineSegments>
       <points>
          <bufferGeometry>
             <bufferAttribute attach="attributes-position" count={lines.length} array={new Float32Array(lines.flatMap(v => [v.x, v.y, v.z]))} itemSize={3} />
          </bufferGeometry>
-         <pointsMaterial size={0.2} color="white" transparent opacity={0.8} />
+         {/* Increased size from 0.2 to 0.8 for Mobile Visibility */}
+         <pointsMaterial size={0.8} color="white" transparent opacity={0.9} sizeAttenuation={true} />
       </points>
     </group>
   );
@@ -79,10 +80,13 @@ const Constellations = () => {
 const GalaxyBackground = () => {
   return (
     <div className="fixed inset-0 z-0 pointer-events-none bg-black">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#111827_0%,_#000000_100%)] opacity-90" />
-      <Canvas camera={{ position: [0, 0, 15], fov: 45 }}>
+      {/* Darker base gradient to make stars pop */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#0f172a_0%,_#000000_100%)] opacity-90" />
+      
+      <Canvas camera={{ position: [0, 0, 15], fov: 45 }} dpr={[1, 2]}>
         <fog attach="fog" args={['#000000', 10, 40]} />
-        <Stars radius={80} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
+        {/* Increased factor (size) from 4 to 7 */}
+        <Stars radius={80} depth={50} count={3000} factor={7} saturation={0} fade speed={1} />
         <Nebula />
         <Constellations />
       </Canvas>
