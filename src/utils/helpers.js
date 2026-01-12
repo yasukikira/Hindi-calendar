@@ -88,12 +88,13 @@ export const getDayTheme = (date, panchang, monthIdx, lang) => {
   const { tithiRaw } = panchang;
   const tData = DATA[lang] || DATA['en'];
 
+  // --- FIXED DATE FESTIVALS ---
   if (d === 1 && m === 0) return { type: 'newyear', name: lang === 'hi' ? 'नव वर्ष' : 'New Year', icon: '🎉' };
   
-  // National Holidays
   if (d === 26 && m === 0) return { type: 'national', name: lang === 'hi' ? 'गणतंत्र दिवस' : 'Republic Day', icon: '🇮🇳' };
   if (d === 15 && m === 7) return { type: 'national', name: lang === 'hi' ? 'स्वतंत्रता दिवस' : 'Independence Day', icon: '🇮🇳' };
   if (d === 2 && m === 9) return { type: 'national', name: lang === 'hi' ? 'गांधी जयंती' : 'Gandhi Jayanti', icon: '🕊️' };
+  
   if (d === 14 && m === 3) return { type: 'national', name: lang === 'hi' ? 'अम्बेडकर जयंती' : 'Ambedkar Jayanti', icon: '⚖️' };
   if (d === 14 && m === 10) return { type: 'festive', name: lang === 'hi' ? 'बाल दिवस' : "Children's Day", icon: '🎈' };
 
@@ -101,18 +102,18 @@ export const getDayTheme = (date, panchang, monthIdx, lang) => {
   if (d === 14 && m === 1) return { type: 'valentine', name: lang === 'hi' ? 'वैलेंटाइन्स डे' : "Valentine's Day", icon: '💖' };
   if (d === 25 && m === 11) return { type: 'christmas', name: lang === 'hi' ? 'क्रिसमस' : 'Christmas', icon: '🎄' };
 
-  // NAVRATRI (Adjusted to end on Navami, 9 days)
+  // --- NAVRATRI (9 DAYS LOGIC) ---
   // Chaitra 2026: Mar 19 - 27
   if (y === 2026 && isDateInRange(d, m, y, 19, 2, 27, 2)) return { type: 'navratri', name: lang === 'hi' ? 'चैत्र नवरात्रि' : 'Chaitra Navratri', icon: '🔱' };
   // Sharad 2026: Oct 11 - 19 
   if (y === 2026 && isDateInRange(d, m, y, 11, 9, 19, 9)) return { type: 'navratri', name: lang === 'hi' ? 'शारदीय नवरात्रि' : 'Sharad Navratri', icon: '🕉️' };
   
-  // Chaitra 2025: Mar 30 - Apr 6 (Approx range fix)
+  // Chaitra 2025: Mar 30 - Apr 6
   if (y === 2025 && ((m===2 && d>=30) || (m===3 && d<=6))) return { type: 'navratri', name: lang === 'hi' ? 'चैत्र नवरात्रि' : 'Chaitra Navratri', icon: '🔱' };
-  // Sharad 2025: Sep 22 - 30
-  if (y === 2025 && ((m===8 && d>=22) || (m===8 && d<=30))) return { type: 'navratri', name: lang === 'hi' ? 'शारदीय नवरात्रि' : 'Sharad Navratri', icon: '🕉️' };
+  // Sharad 2025: Sep 22 - Oct 2
+  if (y === 2025 && ((m===8 && d>=22) || (m===9 && d<=2))) return { type: 'navratri', name: lang === 'hi' ? 'शारदीय नवरात्रि' : 'Sharad Navratri', icon: '🕉️' };
 
-  // Specific Dates - ALL PRESERVED
+  // --- SPECIFIC DATES (FULL LIST RESTORED) ---
   const festivals = {
     2025: {
       '1-26': { type: 'shivratri', name: 'Mahashivratri', icon: '🕉️' },
@@ -146,7 +147,7 @@ export const getDayTheme = (date, panchang, monthIdx, lang) => {
     return { ...f, name: (lang === 'hi' || lang === 'mr') ? getHindiName(f.name) : f.name };
   }
 
-  // Tithi Fallbacks
+  // --- TITHI FALLBACKS ---
   if (tithiRaw === 14) return { type: 'purnima', name: tData.tithis[14], icon: '🌕' };
   if (tithiRaw === 29) return { type: 'amavasya', name: tData.tithis[15], icon: '🌑' };
   if (tithiRaw === 10) return { type: 'ekadashi', name: tData.tithis[10], icon: '🙏' };
@@ -154,7 +155,7 @@ export const getDayTheme = (date, panchang, monthIdx, lang) => {
   return null;
 };
 
-// PRESERVED HELPER
+// HELPER RESTORED
 function getHindiName(enName) {
   const map = {
     'Mahashivratri': 'महाशिवरात्रि', 'Holi': 'होली', 'Eid-ul-Fitr': 'ईद-उल-फितर',
