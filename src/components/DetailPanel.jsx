@@ -99,13 +99,15 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, onDeleteEvent, lang, d
     return diffDays > 0 ? `${diffDays} ${dayWord}` : `${Math.abs(diffDays)} ${dayWord}`;
   };
 
-  // RESTORED DEFAULT DARK THEME LOGIC
-  // If no festival theme is present, it defaults to 'theme-default' (defined in CustomStyles as dark/black)
+  // RESTORED: Standard Day Theme
+  // If no specific theme is found, use 'theme-default' (Dark gradient)
   const headerClass = theme ? `theme-${theme.type}` : 'theme-default';
   
+  // FIX: Identify light themes to force black text
   const isLightTheme = theme && ['purnima', 'national', 'sankranti', 'diwali', 'ganesh', 'rakhi', 'holi', 'festive', 'christmas', 'newyear'].includes(theme.type);
   
-  // If it's a default day (no theme), we WANT white text (because background is dark 'theme-default')
+  // If no theme (default) -> text should be WHITE (because background is dark gradient)
+  // If theme is Purnima -> text should be BLACK
   const textColor = (isLightTheme) ? 'text-gray-900' : 'text-white';
   const closeBtnColor = (isLightTheme) ? 'bg-black/10 hover:bg-black/20 text-gray-900' : 'bg-black/20 hover:bg-black/40 text-white';
 
@@ -163,18 +165,7 @@ const DetailPanel = ({ date, onClose, events, onAddEvent, onDeleteEvent, lang, d
                 </div>
               </div>
               <div className="space-y-3 mb-4">
-                {events && events.length > 0 ? (events.map((evt, i) => (
-                  <div key={i} className={`flex items-start justify-between gap-3 p-3 rounded-lg border group ${darkMode ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50 border-blue-100'}`}>
-                    <div className="flex items-start gap-3">
-                      <div className="w-2 h-2 mt-1.5 rounded-full bg-blue-500 shrink-0" />
-                      <p className="text-sm leading-relaxed opacity-90">{evt}</p>
-                    </div>
-                    {/* ADDED DELETE BUTTON */}
-                    <button onClick={() => onDeleteEvent(i)} className="text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1">
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                ))) : (<p className="text-center opacity-50 italic text-sm py-4">{t.ui.noEvents}</p>)}
+                {events && events.length > 0 ? (events.map((evt, i) => (<div key={i} className={`flex items-start justify-between gap-3 p-3 rounded-lg border group ${darkMode ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50 border-blue-100'}`}><div className="flex items-start gap-3"><div className="w-2 h-2 mt-1.5 rounded-full bg-blue-500 shrink-0" /><p className="text-sm leading-relaxed opacity-90">{evt}</p></div><button onClick={() => onDeleteEvent(i)} className="text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-1"><Trash2 size={14} /></button></div>))) : (<p className="text-center opacity-50 italic text-sm py-4">{t.ui.noEvents}</p>)}
               </div>
               <div className="flex gap-2 relative group">
                 <input type="text" value={note} onChange={(e) => setNote(e.target.value)} placeholder={t.ui.addNote} className={`flex-1 border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 bg-white'}`} onKeyDown={(e) => e.key === 'Enter' && (onAddEvent(note), setNote(''))} />
