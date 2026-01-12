@@ -1,25 +1,58 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { ArrowLeft, Calendar as CalIcon } from 'lucide-react'; // Added icons for new UI
 import CustomStyles from './styles/CustomStyles';
 import CalendarHeader from './components/CalendarHeader';
 import DayCell from './components/DayCell';
 import DateJumper from './components/DateJumper';
 import DetailPanel from './components/DetailPanel';
-import GalaxyBackground from './components/GalaxyBackground'; // The 3D Component
+import GalaxyBackground from './components/GalaxyBackground'; 
 import { DATA, MUHURAT_CATEGORIES, MUHURAT_DATES } from './data/constants';
 
 const App = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
-  const [events, setEvents] = useState({});
+  
+  // 1. PERSISTENCE FIX: Load from LocalStorage
+  const [events, setEvents] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('hindiCalendarEvents') || '{}');
+    } catch {
+      return {};
+    }
+  });
+
   const [showJumpModal, setShowJumpModal] = useState(false);
   const [showMuhuratModal, setShowMuhuratModal] = useState(false);
+  const [muhuratCategory, setMuhuratCategory] = useState(null); // New State for Modal UI
   const [isAnimating, setIsAnimating] = useState(false);
   
   const [lang, setLang] = useState(() => localStorage.getItem('hindiCalendarLang') || 'en');
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('hindiCalendarTheme') === 'dark');
 
+  // 2. PERSISTENCE FIX: Save to LocalStorage whenever events change
+  useEffect(() => {
+    localStorage.setItem('hindiCalendarEvents', JSON.stringify(events));
+  }, [events]);
+
   useEffect(() => { localStorage.setItem('hindiCalendarLang', lang); }, [lang]);
   useEffect(() => { localStorage.setItem('hindiCalendarTheme', darkMode ? 'dark' : 'light'); }, [darkMode]);
+
+  // 3. NOTIFICATION SYSTEM: Check for today's notes on load
+  useEffect(() => {
+    if ("Notification" in window) {
+      if (Notification.permission === "default") {
+        Notification.requestPermission();
+      }
+      
+      const todayKey = new Date().toDateString();
+      if (events[todayKey] && events[todayKey].length > 0 && Notification.permission === "granted") {
+        new Notification("📅 Today's Notes", {
+          body: `You have ${events[todayKey].length} note(s) for today:\n${events[todayKey][0]}...`,
+          icon: "/pwa-192x192.png" // Assumes you have PWA icons
+        });
+      }
+    }
+  }, []); // Runs once on mount
 
   const toggleDarkMode = () => setDarkMode(!darkMode);
 
@@ -31,10 +64,26 @@ const App = () => {
   const changeMonth = (delta) => handleTransition(() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + delta, 1)));
   const handleDateJump = (newDate) => handleTransition(() => { setCurrentDate(newDate); setSelectedDate(newDate); });
   const goToToday = () => handleTransition(() => { const now = new Date(); setCurrentDate(now); setSelectedDate(now); });
+  
   const handleAddEvent = (txt) => {
     if (!selectedDate || !txt.trim()) return;
     const key = selectedDate.toDateString();
     setEvents(prev => ({ ...prev, [key]: [...(prev[key] || []), txt] }));
+  };
+
+  // 4. MANAGEMENT FIX: Delete Event Handler
+  const handleDeleteEvent = (index) => {
+    if (!selectedDate) return;
+    const key = selectedDate.toDateString();
+    setEvents(prev => {
+      const newEvents = [...(prev[key] || [])];
+      newEvents.splice(index, 1);
+      if (newEvents.length === 0) {
+        const { [key]: deleted, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [key]: newEvents };
+    });
   };
 
   const t = DATA[lang] || DATA['en'];
@@ -56,8 +105,6 @@ const App = () => {
   return (
     <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'dark-mode' : 'bg-[#f8f9fa] text-gray-900'} ${lang !== 'en' ? 'font-hindi' : 'font-eng'}`}>
       <CustomStyles />
-      
-      {/* 3D Galaxy Background (Only active in Dark Mode) */}
       {darkMode && <GalaxyBackground />}
 
       <div className={`max-w-6xl mx-auto min-h-screen flex flex-col shadow-2xl border-x ${darkMode ? 'border-gray-800 bg-gray-900/80 backdrop-blur-sm' : 'border-gray-100 bg-white'} relative z-10`}>
@@ -75,7 +122,7 @@ const App = () => {
 
         <div className={`px-4 py-2 border-b ${darkMode ? 'border-gray-800 bg-gray-800/50' : 'border-gray-100 bg-orange-50'} flex justify-between items-center`}>
           <span className="text-xs font-bold uppercase tracking-widest text-orange-500">{t.ui.muhuratFor || "Muhurats"} 2026</span>
-          <button onClick={() => setShowMuhuratModal(true)} className="text-xs font-bold underline decoration-orange-400 decoration-2 underline-offset-4 hover:text-orange-600">
+          <button onClick={() => { setShowMuhuratModal(true); setMuhuratCategory(null); }} className="text-xs font-bold underline decoration-orange-400 decoration-2 underline-offset-4 hover:text-orange-600">
             {t.ui.find || "Find Dates"} →
           </button>
         </div>
@@ -102,7 +149,7 @@ const App = () => {
                 events={events[item.d.toDateString()]}
                 onClick={setSelectedDate}
                 lang={lang}
-                darkMode={darkMode} // PASSING THE PROP HERE FIXED THE BLACK CARD BUG
+                darkMode={darkMode}
               />
             );
           })}
@@ -117,26 +164,53 @@ const App = () => {
 
       <DateJumper isOpen={showJumpModal} onClose={() => setShowJumpModal(false)} onJump={handleDateJump} lang={lang} darkMode={darkMode} />
 
+      {/* 5. NEW 2-STEP MUHURAT UI */}
       {showMuhuratModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={() => setShowMuhuratModal(false)}>
-          <div className={`w-full max-w-md rounded-2xl p-6 relative ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'} animate-pop-in`} onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowMuhuratModal(false)} className="absolute top-4 right-4 p-2 bg-black/10 rounded-full hover:bg-black/20">✕</button>
-            <h2 className="text-xl font-bold mb-6">{t.ui.finder || "Muhurat Finder"}</h2>
-            <div className="grid grid-cols-2 gap-4">
-              {MUHURAT_CATEGORIES.map((cat) => (
-                <div key={cat.id} className={`p-4 rounded-xl border cursor-pointer hover:border-orange-500 transition-all ${darkMode ? 'border-gray-700 bg-gray-700' : 'border-gray-200 bg-gray-50'}`}
-                  onClick={() => {
-                     const firstDate = new Date(MUHURAT_DATES[cat.id][0]);
-                     handleDateJump(firstDate);
-                     setShowMuhuratModal(false);
-                  }}
-                >
-                  <div className="text-2xl mb-2">{cat.icon}</div>
-                  <div className="font-medium text-sm">{cat.label[lang] || cat.label['en']}</div>
-                  <div className="text-xs opacity-60 mt-1">{MUHURAT_DATES[cat.id].length} Dates</div>
+          <div className={`w-full max-w-md rounded-2xl p-6 relative h-[500px] flex flex-col ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'} animate-pop-in`} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowMuhuratModal(false)} className="absolute top-4 right-4 p-2 bg-black/10 rounded-full hover:bg-black/20 z-10">✕</button>
+            
+            {!muhuratCategory ? (
+              // STEP 1: Categories
+              <>
+                <h2 className="text-xl font-bold mb-6">{t.ui.finder || "Muhurat Finder"}</h2>
+                <div className="grid grid-cols-2 gap-4 overflow-y-auto">
+                  {MUHURAT_CATEGORIES.map((cat) => (
+                    <div key={cat.id} className={`p-4 rounded-xl border cursor-pointer hover:border-orange-500 transition-all ${darkMode ? 'border-gray-700 bg-gray-700' : 'border-gray-200 bg-gray-50'}`}
+                      onClick={() => setMuhuratCategory(cat)}
+                    >
+                      <div className="text-2xl mb-2">{cat.icon}</div>
+                      <div className="font-medium text-sm">{cat.label[lang] || cat.label['en']}</div>
+                      <div className="text-xs opacity-60 mt-1">{MUHURAT_DATES[cat.id].length} Dates</div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            ) : (
+              // STEP 2: List of Dates
+              <>
+                <div className="flex items-center gap-3 mb-4">
+                  <button onClick={() => setMuhuratCategory(null)} className="p-2 rounded-full hover:bg-black/10"><ArrowLeft size={20} /></button>
+                  <h2 className="text-xl font-bold flex items-center gap-2">{muhuratCategory.icon} {muhuratCategory.label[lang] || muhuratCategory.label['en']}</h2>
+                </div>
+                <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                  {MUHURAT_DATES[muhuratCategory.id].map((dateStr, i) => {
+                    const d = new Date(dateStr);
+                    return (
+                      <div key={i} onClick={() => { handleDateJump(d); setShowMuhuratModal(false); }}
+                        className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer hover:border-orange-500 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <CalIcon size={16} className="text-orange-500"/>
+                          <span className="font-medium">{d.toLocaleDateString(lang === 'en' ? 'en-US' : 'hi-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                        </div>
+                        <span className="text-xs opacity-50">Go →</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -144,7 +218,15 @@ const App = () => {
       {selectedDate && (
         <>
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-300" onClick={() => setSelectedDate(null)} />
-          <DetailPanel date={selectedDate} onClose={() => setSelectedDate(null)} events={events[selectedDate.toDateString()] || []} onAddEvent={handleAddEvent} lang={lang} darkMode={darkMode} />
+          <DetailPanel 
+            date={selectedDate} 
+            onClose={() => setSelectedDate(null)} 
+            events={events[selectedDate.toDateString()] || []} 
+            onAddEvent={handleAddEvent} 
+            onDeleteEvent={handleDeleteEvent} // Pass delete handler
+            lang={lang} 
+            darkMode={darkMode} 
+          />
         </>
       )}
     </div>
