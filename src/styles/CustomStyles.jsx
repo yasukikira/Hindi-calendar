@@ -13,7 +13,11 @@ const CustomStyles = () => (
     @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
     @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
     @keyframes pulse-purple { 0%, 100% { box-shadow: 0 0 10px #d946ef; } 50% { box-shadow: 0 0 20px #a855f7; } }
-    
+    @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } 25%, 75% { opacity: 0.95; } }
+    @keyframes float { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    @keyframes color-shift { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+    @keyframes shine { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+
     .animate-slide-in { animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
     .animate-pop-in { animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -32,20 +36,19 @@ const CustomStyles = () => (
     .dark-mode .border-gray-100 { border-color: #334155; }
 
     /* --- THEMES --- */
-    
     /* Light Themes (Force Black Text) */
     .theme-national, .theme-purnima, .theme-holi, .theme-diwali, .theme-ganesh, .theme-rakhi, .theme-sankranti, .theme-christmas, .theme-newyear, .theme-festive {
       color: #000000 !important;
     }
     .theme-national { background: linear-gradient(135deg, #ff9933 0%, #ffffff 50%, #138808 100%); border-color: #ff9933; }
     .theme-purnima { background: radial-gradient(circle at center, #ffffff 0%, #fefce8 100%); border: 1px solid #fef08a; }
-    .theme-holi { background: radial-gradient(circle at top left, rgba(236, 72, 153, 0.4), transparent 60%), radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.4), transparent 60%); background-color: #fff; }
-    .theme-diwali { background: linear-gradient(to bottom, #fef3c7, #fde68a); border-color: #fbbf24; }
+    .theme-holi { background: radial-gradient(circle at top left, rgba(236, 72, 153, 0.4), transparent 60%), radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.4), transparent 60%); background-color: #fff; animation: color-shift 5s infinite; }
+    .theme-diwali { background: linear-gradient(to bottom, #fef3c7, #fde68a); border-color: #fbbf24; animation: flicker 4s infinite; }
     .theme-ganesh { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-color: #fb923c; }
     .theme-rakhi { background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); border-left: 3px solid #e11d48; }
-    .theme-sankranti { background: linear-gradient(to bottom right, #fef9c3, #bfdbfe); }
+    .theme-sankranti { background: linear-gradient(to bottom right, #fef9c3, #bfdbfe); animation: float 6s infinite; background-size: 150%; }
     .theme-christmas { background: linear-gradient(135deg, #dcfce7 0%, #fee2e2 100%); }
-    .theme-newyear { background: linear-gradient(135deg, #e0e7ff 0%, #fae8ff 100%); border-left: 3px solid #4f46e5; }
+    .theme-newyear { background: linear-gradient(135deg, #e0e7ff 0%, #fae8ff 100%); border-left: 3px solid #4f46e5; animation: shine 8s infinite; background-size: 200%; }
     .theme-festive { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); }
 
     /* Dark Themes (Force White Text) */
@@ -54,10 +57,9 @@ const CustomStyles = () => (
     }
     .theme-amavasya { background: linear-gradient(135deg, #1f2937 0%, #000000 100%); border: 1px solid #374151; }
     .theme-shivratri { background: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%); }
-    .theme-navratri { background: linear-gradient(135deg, #4c1d95 0%, #701a75 100%); border-color: #d946ef; }
+    .theme-navratri { background: linear-gradient(135deg, #4c1d95 0%, #701a75 100%); border-color: #d946ef; animation: pulse-purple 3s infinite; }
     .theme-eid, .theme-bakrid, .theme-milad { background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); border-left: 3px solid #fbbf24; }
     .theme-muharram { background: linear-gradient(135deg, #1f2937 0%, #000000 100%); border-left: 3px solid #ef4444; }
-
   `}</style>
 );
 
