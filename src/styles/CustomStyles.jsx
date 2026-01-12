@@ -8,17 +8,29 @@ const CustomStyles = () => (
     .font-gu { font-family: 'Noto Sans Gujarati', sans-serif; }
     .font-eng { font-family: 'Noto Sans', sans-serif; }
 
-    /* --- ANIMATIONS --- */
+    /* --- ANIMATIONS (ALL RESTORED) --- */
     @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
     @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+    
     @keyframes pulse-purple { 0%, 100% { box-shadow: 0 0 10px #d946ef; } 50% { box-shadow: 0 0 20px #a855f7; } }
     @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } 25%, 75% { opacity: 0.95; } }
     @keyframes float { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
     @keyframes color-shift { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
     @keyframes shine { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
-    @keyframes barberpole { 0% { background-position: 0 0; } 100% { background-position: 50px 50px; } }
-    @keyframes disco { 0% { filter: hue-rotate(0deg); } 50% { filter: hue-rotate(180deg); } 100% { filter: hue-rotate(360deg); } }
+    
+    /* Christmas Stripes */
+    @keyframes barberpole { 
+      0% { background-position: 0 0; } 
+      100% { background-position: 50px 50px; } 
+    }
+    
+    /* New Year Disco */
+    @keyframes disco { 
+      0% { filter: hue-rotate(0deg); } 
+      50% { filter: hue-rotate(180deg); } 
+      100% { filter: hue-rotate(360deg); } 
+    }
 
     .animate-slide-in { animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
@@ -39,7 +51,7 @@ const CustomStyles = () => (
 
     /* --- THEMES --- */
     
-    /* DEFAULT THEME (Restored "Cool" Dark Background for normal days) */
+    /* DEFAULT THEME (Restored cool dark background for normal days) */
     .theme-default {
       background: linear-gradient(to bottom right, #0f172a, #000000);
       color: white !important;
