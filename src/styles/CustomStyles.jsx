@@ -2,9 +2,10 @@ import React from 'react';
 
 const CustomStyles = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif+Devanagari:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif+Devanagari:wght@400;500;600;700&family=Noto+Sans+Gujarati:wght@400;600&display=swap');
 
-    .font-hindi { font-family: 'Noto Serif Devanagari', serif; }
+    .font-hindi, .font-mr { font-family: 'Noto Serif Devanagari', serif; }
+    .font-gu { font-family: 'Noto Sans Gujarati', sans-serif; }
     .font-eng { font-family: 'Noto Sans', sans-serif; }
 
     /* Animation Utilities */
@@ -13,15 +14,50 @@ const CustomStyles = () => (
     @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
     @keyframes pulse-soft { 0%, 100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.4); } 50% { box-shadow: 0 0 0 6px rgba(234, 88, 12, 0); } }
     @keyframes confetti-fall { 0% { transform: translateY(-10px) rotate(0deg); opacity: 1; } 100% { transform: translateY(100px) rotate(360deg); opacity: 0; } }
+    
+    /* Star Twinkle Animation */
+    @keyframes twinkle { 
+      0%, 100% { opacity: 0.8; transform: scale(1); } 
+      50% { opacity: 0.3; transform: scale(0.8); } 
+    }
 
     .confetti-piece { position: absolute; width: 8px; height: 8px; background: rgba(255, 255, 255, 0.6); top: -10px; opacity: 0; }
     .transition-content { transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease; }
     .content-hidden { opacity: 0; filter: blur(4px); transform: scale(0.99); }
     .content-visible { opacity: 1; filter: blur(0); transform: scale(1); }
+    
     .animate-slide-in { animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
     .animate-pop-in { animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .animate-pulse-custom { animation: pulse-soft 2s infinite; }
+
+    /* --- DARK MODE (NIGHT SKY) --- */
+    .dark-mode {
+      background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+      color: #e2e8f0;
+    }
+    .dark-mode .bg-white { background-color: #1e293b; color: #f1f5f9; border-color: #334155; }
+    .dark-mode .text-gray-900 { color: #f1f5f9; }
+    .dark-mode .text-gray-800 { color: #e2e8f0; }
+    .dark-mode .text-gray-600 { color: #94a3b8; }
+    .dark-mode .text-gray-500 { color: #94a3b8; }
+    .dark-mode .bg-gray-50 { background-color: #0f172a; }
+    .dark-mode .bg-gray-100 { background-color: #1e293b; }
+    .dark-mode .border-gray-100, .dark-mode .border-gray-200 { border-color: #334155; }
+    
+    /* Stars Background Pattern */
+    .stars-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: 
+        radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+        radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+        radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+      background-size: 550px 550px, 350px 350px, 250px 250px;
+      background-position: 0 0, 40px 60px, 130px 270px;
+      opacity: 0.6;
+    }
 
     /* --- THEMES --- */
     .theme-tricolor { background: linear-gradient(135deg, rgba(255,153,51,0.15) 0%, rgba(255,255,255,0.8) 50%, rgba(19,136,8,0.15) 100%); border-color: rgba(255,153,51,0.3); }
@@ -37,19 +73,11 @@ const CustomStyles = () => (
     .theme-navratri { background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%); border-color: #d946ef; }
     .theme-janmashtami { background: linear-gradient(135deg, #ccfbf1 0%, #e0f2fe 100%); border-color: #0d9488; }
     .theme-valentine { background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); }
-    
-    /* New Muslim Themes */
     .theme-eid { background: linear-gradient(135deg, #f0fdf4 0%, #ecfccb 100%); border-left: 3px solid #166534; }
     .theme-bakrid { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-color: #15803d; border-right: 3px solid #b45309; }
     .theme-muharram { background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border-left: 3px solid #000000; }
     .theme-milad { background: linear-gradient(135deg, #ecfccb 0%, #f7fee7 100%); border-color: #84cc16; }
-
-    /* New Year Theme */
-    .theme-newyear {
-      background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 100%);
-      border: 1px solid #6366f1;
-      border-left: 3px solid #4f46e5;
-    }
+    .theme-newyear { background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 100%); border: 1px solid #6366f1; border-left: 3px solid #4f46e5; }
   `}</style>
 );
 
