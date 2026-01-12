@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sun, Moon, Calendar as CalendarIcon, Clock, MapPin, Share2, MessageCircle, CalendarPlus, AlertTriangle } from 'lucide-react';
+import { X, Sun, Moon, Calendar as CalendarIcon, MapPin, MessageCircle, CalendarPlus, AlertTriangle } from 'lucide-react';
 import SunCalc from 'suncalc';
 import { DATA, NAKSHATRAS_EN, NAKSHATRAS_HI, NAKSHATRAS_MR, NAKSHATRAS_GU } from '../data/constants';
 import { calculatePanchang, getHindiMonthIndex, getDayTheme, getChoghadiya, getAuspiciousTimes } from '../utils/helpers';
@@ -108,7 +108,6 @@ Check: https://yasukikira.github.io/Hindi-calendar/
     }
   };
 
-  // RESTORED: Google Calendar Link (Opens Calendar directly)
   const addToGoogleCalendar = () => {
     const title = theme ? theme.name : `Panchang: ${tithiName}`;
     const desc = `${tithiName}, ${pakshaName} Paksha. Nakshatra: ${nakshatraName}.`;
