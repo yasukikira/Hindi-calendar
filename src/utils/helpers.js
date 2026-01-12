@@ -65,7 +65,7 @@ export const getChoghadiya = (date, lang) => {
 
   return slots.map((time, i) => {
     const type = seq[i];
-    const labelData = DATA[lang] || DATA['en']; // Fallback
+    const labelData = DATA[lang] || DATA['en']; 
     const label = labelData.choghadiya[type];
     let quality = 'neutral';
     if (['amrit', 'shubh', 'labh', 'chal'].includes(type)) quality = 'good';
@@ -81,51 +81,74 @@ export const getDayTheme = (date, panchang, monthIdx, lang) => {
   const { tithiRaw } = panchang;
   const tData = DATA[lang] || DATA['en'];
 
-  // Helper for translating names
-  const tr = (key, fallback) => key; // Simplified for fixed strings, or extend logic if needed
+  // --- FIXED DATE FESTIVALS ---
+  if (d === 1 && m === 0) return { type: 'newyear', name: lang === 'hi' ? 'नव वर्ष' : 'New Year', icon: '🎉' };
+  
+  // National Holidays (Crucial Fix: type 'national' matches CSS .theme-national)
+  if (d === 26 && m === 0) return { type: 'national', name: lang === 'hi' ? 'गणतंत्र दिवस' : 'Republic Day', icon: '🇮🇳' };
+  if (d === 15 && m === 7) return { type: 'national', name: lang === 'hi' ? 'स्वतंत्रता दिवस' : 'Independence Day', icon: '🇮🇳' };
+  if (d === 2 && m === 9) return { type: 'national', name: lang === 'hi' ? 'गांधी जयंती' : 'Gandhi Jayanti', icon: '🕊️' };
+  
+  if (d === 14 && m === 0) return { type: 'sankranti', name: lang === 'hi' ? 'मकर संक्रांति' : 'Makar Sankranti', icon: '🪁' };
+  if (d === 14 && m === 1) return { type: 'valentine', name: lang === 'hi' ? 'वैलेंटाइन्स डे' : "Valentine's Day", icon: '💖' };
+  if (d === 25 && m === 11) return { type: 'christmas', name: lang === 'hi' ? 'क्रिसमस' : 'Christmas', icon: '🎄' };
 
-  // Fixed
-  if (d === 1 && m === 0) return { type: 'newyear', name: lang === 'en' ? 'New Year' : (lang === 'hi' ? 'नव वर्ष' : (lang === 'mr' ? 'नवीन वर्ष' : 'નવું વર્ષ')), icon: '🎉' };
-  if (d === 26 && m === 0) return { type: 'national', name: lang === 'en' ? 'Republic Day' : (lang === 'hi' ? 'गणतंत्र दिवस' : (lang === 'mr' ? 'प्रजासत्ताक दिन' : 'પ્રજાસત્તાક દિવસ')), icon: '🇮🇳' };
-  if (d === 15 && m === 7) return { type: 'national', name: lang === 'en' ? 'Independence Day' : (lang === 'hi' ? 'स्वतंत्रता दिवस' : (lang === 'mr' ? 'स्वातंत्र्य दिन' : 'સ્વતંત્રતા દિવસ')), icon: '🇮🇳' };
-  if (d === 2 && m === 9) return { type: 'national', name: lang === 'en' ? 'Gandhi Jayanti' : 'गांधी जयंती', icon: '🕊️' };
-  if (d === 14 && m === 0) return { type: 'sankranti', name: lang === 'en' ? 'Makar Sankranti' : 'मकर संक्रांति', icon: '🪁' };
-  if (d === 14 && m === 1) return { type: 'valentine', name: lang === 'en' ? "Valentine's Day" : (lang === 'gu' ? 'વેલેન્ટાઇન ડે' : 'वैलेंटाइन्स डे'), icon: '💖' };
-  if (d === 25 && m === 11) return { type: 'christmas', name: lang === 'en' ? 'Christmas' : 'क्रिसमस', icon: '🎄' };
+  // --- DYNAMIC DATES (2025/2026) ---
+  const festivals = {
+    2025: {
+      '1-26': { type: 'shivratri', name: 'Mahashivratri', icon: '🕉️' },
+      '2-14': { type: 'holi', name: 'Holi', icon: '🎨' },
+      '2-31': { type: 'eid', name: 'Eid-ul-Fitr', icon: '☪️' },
+      '5-6': { type: 'bakrid', name: 'Eid al-Adha', icon: '🐐' },
+      '6-6': { type: 'muharram', name: 'Muharram', icon: '🕌' },
+      '7-9': { type: 'rakhi', name: 'Raksha Bandhan', icon: '🎁' },
+      '7-16': { type: 'janmashtami', name: 'Janmashtami', icon: '🪈' },
+      '7-26': { type: 'ganesh', name: 'Ganesh Chaturthi', icon: '🐘' },
+      '8-5': { type: 'onam', name: 'Onam', icon: '🌸' },
+      '9-2': { type: 'festive', name: 'Dussehra', icon: '🏹' },
+      '9-20': { type: 'diwali', name: 'Diwali', icon: '🪔' }
+    },
+    2026: {
+      '1-15': { type: 'shivratri', name: 'Mahashivratri', icon: '🕉️' },
+      '2-4': { type: 'holi', name: 'Holi', icon: '🎨' },
+      '2-20': { type: 'eid', name: 'Eid-ul-Fitr', icon: '☪️' },
+      '4-27': { type: 'bakrid', name: 'Eid al-Adha', icon: '🐐' },
+      '7-28': { type: 'rakhi', name: 'Raksha Bandhan', icon: '🎁' },
+      '8-4': { type: 'janmashtami', name: 'Janmashtami', icon: '🪈' },
+      '8-14': { type: 'ganesh', name: 'Ganesh Chaturthi', icon: '🐘' },
+      '9-20': { type: 'festive', name: 'Dussehra', icon: '🏹' },
+      '10-8': { type: 'diwali', name: 'Diwali', icon: '🪔' }
+    }
+  };
 
-  // Note: For dynamic years, we keep the simple Hindi names as they are widely understood, or add dictionary lookup if strictly needed.
-  if (y === 2025) {
-    if (d === 26 && m === 1) return { type: 'shivratri', name: 'Mahashivratri', icon: '🕉️' };
-    if (d === 14 && m === 2) return { type: 'holi', name: 'Holi', icon: '🎨' };
-    if (d === 31 && m === 2) return { type: 'eid', name: 'Eid-ul-Fitr', icon: '☪️' };
-    if (d === 6 && m === 5) return { type: 'bakrid', name: 'Eid al-Adha', icon: '🐐' };
-    if (d === 6 && m === 6) return { type: 'muharram', name: 'Muharram', icon: '🕌' };
-    if (d === 9 && m === 7) return { type: 'rakhi', name: 'Raksha Bandhan', icon: '🎁' };
-    if (d === 16 && m === 7) return { type: 'janmashtami', name: 'Janmashtami', icon: '🪈' };
-    if (d === 26 && m === 7) return { type: 'ganesh', name: 'Ganesh Chaturthi', icon: '🐘' };
-    if (d === 5 && m === 8) return { type: 'onam', name: 'Onam', icon: '🌸' };
-    if (d === 5 && m === 8) return { type: 'milad', name: 'Milad-un-Nabi', icon: '📿' };
-    if (d === 2 && m === 9) return { type: 'festive', name: 'Dussehra', icon: '🏹' };
-    if (d === 20 && m === 9) return { type: 'diwali', name: 'Diwali', icon: '🪔' };
+  const key = `${m}-${d}`;
+  if (festivals[y] && festivals[y][key]) {
+    const f = festivals[y][key];
+    // Simple localization check
+    return { ...f, name: (lang === 'hi' || lang === 'mr') ? getHindiName(f.name) : f.name };
   }
-  if (y === 2026) {
-    if (d === 15 && m === 1) return { type: 'shivratri', name: 'Mahashivratri', icon: '🕉️' };
-    if (d === 4 && m === 2) return { type: 'holi', name: 'Holi', icon: '🎨' };
-    if (d === 20 && m === 2) return { type: 'eid', name: 'Eid-ul-Fitr', icon: '☪️' };
-    if (d === 27 && m === 4) return { type: 'bakrid', name: 'Eid al-Adha', icon: '🐐' };
-    if (d === 28 && m === 7) return { type: 'rakhi', name: 'Raksha Bandhan', icon: '🎁' };
-    if (d === 4 && m === 8) return { type: 'janmashtami', name: 'Janmashtami', icon: '🪈' };
-    if (d === 14 && m === 8) return { type: 'ganesh', name: 'Ganesh Chaturthi', icon: '🐘' };
-    if (d === 20 && m === 9) return { type: 'festive', name: 'Dussehra', icon: '🏹' };
-    if (d === 8 && m === 10) return { type: 'diwali', name: 'Diwali', icon: '🪔' };
-  }
 
+  // --- TITHI BASED FALLBACK ---
+  // Purnima (Full Moon) - Crucial for visual fix
   if (tithiRaw === 14) return { type: 'purnima', name: tData.tithis[14], icon: '🌕' };
+  // Amavasya (New Moon)
   if (tithiRaw === 29) return { type: 'amavasya', name: tData.tithis[15], icon: '🌑' };
+  // Ekadashi
   if (tithiRaw === 10) return { type: 'ekadashi', name: tData.tithis[10], icon: '🙏' };
 
   return null;
 };
+
+// Helper to keep helper clean
+function getHindiName(enName) {
+  const map = {
+    'Mahashivratri': 'महाशिवरात्रि', 'Holi': 'होली', 'Eid-ul-Fitr': 'ईद-उल-फितर',
+    'Eid al-Adha': 'बकरीद', 'Muharram': 'मुहर्रम', 'Raksha Bandhan': 'रक्षा बंधन',
+    'Janmashtami': 'जन्माष्टमी', 'Ganesh Chaturthi': 'गणेश चतुर्थी', 'Onam': 'ओणम',
+    'Dussehra': 'दशहरा', 'Diwali': 'दीपावली'
+  };
+  return map[enName] || enName;
+}
 
 export const getAuspiciousTimes = (date, sunTimes) => {
   if (!sunTimes) return null;
