@@ -8,15 +8,29 @@ const CustomStyles = () => (
     .font-gu { font-family: 'Noto Sans Gujarati', sans-serif; }
     .font-eng { font-family: 'Noto Sans', sans-serif; }
 
-    /* --- ANIMATIONS (RESTORED) --- */
+    /* --- ANIMATIONS (ALL RESTORED) --- */
     @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
     @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+    
     @keyframes pulse-purple { 0%, 100% { box-shadow: 0 0 10px #d946ef; } 50% { box-shadow: 0 0 20px #a855f7; } }
     @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } 25%, 75% { opacity: 0.95; } }
     @keyframes float { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
     @keyframes color-shift { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
     @keyframes shine { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+    
+    /* Christmas Stripes */
+    @keyframes barberpole { 
+      0% { background-position: 0 0; } 
+      100% { background-position: 50px 50px; } 
+    }
+    
+    /* New Year Disco */
+    @keyframes disco { 
+      0% { filter: hue-rotate(0deg); } 
+      50% { filter: hue-rotate(180deg); } 
+      100% { filter: hue-rotate(360deg); } 
+    }
 
     .animate-slide-in { animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
@@ -35,21 +49,36 @@ const CustomStyles = () => (
     .dark-mode .text-gray-600 { color: #94a3b8; }
     .dark-mode .border-gray-100 { border-color: #334155; }
 
-    /* --- THEMES (RESTORED) --- */
+    /* --- THEMES --- */
     
     /* Light Themes (Force Black Text) */
     .theme-national, .theme-purnima, .theme-holi, .theme-diwali, .theme-ganesh, .theme-rakhi, .theme-sankranti, .theme-christmas, .theme-newyear, .theme-festive {
       color: #000000 !important;
     }
     .theme-national { background: linear-gradient(135deg, #ff9933 0%, #ffffff 50%, #138808 100%); border-color: #ff9933; }
+    
+    /* Purnima Fix */
     .theme-purnima { background: radial-gradient(circle at center, #ffffff 0%, #fefce8 100%); border: 1px solid #fef08a; }
+    
     .theme-holi { background: radial-gradient(circle at top left, rgba(236, 72, 153, 0.4), transparent 60%), radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.4), transparent 60%); background-color: #fff; animation: color-shift 5s infinite; }
     .theme-diwali { background: linear-gradient(to bottom, #fef3c7, #fde68a); border-color: #fbbf24; animation: flicker 4s infinite; }
     .theme-ganesh { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-color: #fb923c; }
     .theme-rakhi { background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); border-left: 3px solid #e11d48; }
     .theme-sankranti { background: linear-gradient(to bottom right, #fef9c3, #bfdbfe); animation: float 6s infinite; background-size: 150%; }
-    .theme-christmas { background: linear-gradient(135deg, #dcfce7 0%, #fee2e2 100%); }
-    .theme-newyear { background: linear-gradient(135deg, #e0e7ff 0%, #fae8ff 100%); border-left: 3px solid #4f46e5; animation: shine 8s infinite; background-size: 200%; }
+    
+    /* Improved Christmas Animation */
+    .theme-christmas { 
+      background: repeating-linear-gradient(45deg, #dcfce7, #dcfce7 10px, #fee2e2 10px, #fee2e2 20px);
+      animation: barberpole 20s linear infinite;
+    }
+    
+    /* Improved New Year Animation */
+    .theme-newyear { 
+      background: linear-gradient(135deg, #e0e7ff 0%, #fae8ff 100%); 
+      border-left: 3px solid #4f46e5; 
+      animation: disco 8s infinite alternate;
+    }
+    
     .theme-festive { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); }
 
     /* Dark Themes (Force White Text) */
