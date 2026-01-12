@@ -8,7 +8,7 @@ const CustomStyles = () => (
     .font-gu { font-family: 'Noto Sans Gujarati', sans-serif; }
     .font-eng { font-family: 'Noto Sans', sans-serif; }
 
-    /* --- ANIMATIONS --- */
+    /* --- ANIMATIONS (RESTORED) --- */
     @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
     @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
@@ -35,7 +35,8 @@ const CustomStyles = () => (
     .dark-mode .text-gray-600 { color: #94a3b8; }
     .dark-mode .border-gray-100 { border-color: #334155; }
 
-    /* --- THEMES --- */
+    /* --- THEMES (RESTORED) --- */
+    
     /* Light Themes (Force Black Text) */
     .theme-national, .theme-purnima, .theme-holi, .theme-diwali, .theme-ganesh, .theme-rakhi, .theme-sankranti, .theme-christmas, .theme-newyear, .theme-festive {
       color: #000000 !important;
