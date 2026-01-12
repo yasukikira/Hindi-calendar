@@ -95,23 +95,20 @@ export const getDayTheme = (date, panchang, monthIdx, lang) => {
   if (d === 15 && m === 7) return { type: 'national', name: lang === 'hi' ? 'स्वतंत्रता दिवस' : 'Independence Day', icon: '🇮🇳' };
   if (d === 2 && m === 9) return { type: 'national', name: lang === 'hi' ? 'गांधी जयंती' : 'Gandhi Jayanti', icon: '🕊️' };
   if (d === 14 && m === 3) return { type: 'national', name: lang === 'hi' ? 'अम्बेडकर जयंती' : 'Ambedkar Jayanti', icon: '⚖️' };
-  
+  if (d === 14 && m === 10) return { type: 'festive', name: lang === 'hi' ? 'बाल दिवस' : "Children's Day", icon: '🎈' };
+
   if (d === 14 && m === 0) return { type: 'sankranti', name: lang === 'hi' ? 'मकर संक्रांति' : 'Makar Sankranti', icon: '🪁' };
   if (d === 14 && m === 1) return { type: 'valentine', name: lang === 'hi' ? 'वैलेंटाइन्स डे' : "Valentine's Day", icon: '💖' };
   if (d === 25 && m === 11) return { type: 'christmas', name: lang === 'hi' ? 'क्रिसमस' : 'Christmas', icon: '🎄' };
 
-  // NAVRATRI (9 Days Logic)
-  // Chaitra 2026: Mar 19-27
+  // NAVRATRI (9 Days Logic) - Restored
   if (y === 2026 && isDateInRange(d, m, y, 19, 2, 27, 2)) return { type: 'navratri', name: lang === 'hi' ? 'चैत्र नवरात्रि' : 'Chaitra Navratri', icon: '🔱' };
-  // Sharad 2026: Oct 11-20
   if (y === 2026 && isDateInRange(d, m, y, 11, 9, 20, 9)) return { type: 'navratri', name: lang === 'hi' ? 'शारदीय नवरात्रि' : 'Sharad Navratri', icon: '🕉️' };
   
-  // Chaitra 2025: Mar 30 - Apr 6
   if (y === 2025 && ((m===2 && d>=30) || (m===3 && d<=6))) return { type: 'navratri', name: lang === 'hi' ? 'चैत्र नवरात्रि' : 'Chaitra Navratri', icon: '🔱' };
-  // Sharad 2025: Sep 22 - Oct 2
   if (y === 2025 && ((m===8 && d>=22) || (m===9 && d<=2))) return { type: 'navratri', name: lang === 'hi' ? 'शारदीय नवरात्रि' : 'Sharad Navratri', icon: '🕉️' };
 
-  // Specific Dates
+  // Specific Dates - Restored
   const festivals = {
     2025: {
       '1-26': { type: 'shivratri', name: 'Mahashivratri', icon: '🕉️' },
@@ -153,7 +150,7 @@ export const getDayTheme = (date, panchang, monthIdx, lang) => {
   return null;
 };
 
-// RESTORED HELPER FUNCTION
+// Helper function
 function getHindiName(enName) {
   const map = {
     'Mahashivratri': 'महाशिवरात्रि', 'Holi': 'होली', 'Eid-ul-Fitr': 'ईद-उल-फितर',
